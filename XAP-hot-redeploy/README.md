@@ -19,12 +19,12 @@ It will create `XAP-hot-redeploy-0.0.1-SNAPSHOT.zip` file.
 Run
 ---
 
-1. Copy `product-hot-redeploy-0.0.1-SNAPSHOT.zip` to any host where the script will be run from. 
-2. Unzip `product-hot-redeploy-0.0.1-SNAPSHOT.zip` file.
+1. Copy `XAP-hot-redeploy-0.0.1-SNAPSHOT.zip` to any host where the script will be run from. 
+2. Unzip `XAP-hot-redeploy-0.0.1-SNAPSHOT.zip` file.
 3. Configure password-less ssh connection between client machine and GSM hosts (see [SSH login without password] page for instruction).
 4. Copy jar file with new classes to the folder with .sh file.
 5. Configure environment properties in `properties.sh` file.
-6. Run `product-hot-redeploy.sh` script.
+6. Run `XAP-hot-redeploy.sh` script.
 
 Results
 ---
