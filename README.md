@@ -1,4 +1,4 @@
-XAP-hot-redeploy
+XAP hot deploy
 ===
 
 About
