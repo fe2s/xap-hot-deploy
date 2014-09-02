@@ -30,21 +30,21 @@ Results
 ---
 In case if there are no problems with hot-redeploy application you can see success message and details for restarting pu instances: 
 ```sh
-12:17:20,996  INFO main HotRedeployMain:restartPUInstance:91 - restarting instance 1 on localhost GSC PID:31791 mode:backup...
-12:17:25,523  INFO main HotRedeployMain:restartPUInstance:98 - done
-12:17:25,523  INFO main HotRedeployMain:restartPUInstance:91 - restarting instance 2 on localhost GSC PID:31794 mode:backup...
-12:17:29,784  INFO main HotRedeployMain:restartPUInstance:98 - done
-12:17:29,784  INFO main HotRedeployMain:restartPUInstance:91 - restarting instance 2 on localhost GSC PID:31791 mode:primary...
-12:17:39,913  INFO main HotRedeployMain:restartPUInstance:98 - done
-12:17:39,914  INFO main HotRedeployMain:restartPUInstance:91 - restarting instance 1 on localhost GSC PID:31794 mode:primary...
-12:17:49,077  INFO main HotRedeployMain:restartPUInstance:98 - done
-12:17:49,117  INFO main HotRedeployMain:main:84 - Hot redeploy is SUCCESS
+20:05:37,762  INFO main HotRedeployMain:restartPUInstance:55 - restarting instance 2 on EVBYMINSD48AA.minsk.epam.com[10.6.132.93] GSC PID:31794 mode:backup...
+20:05:41,534  INFO main HotRedeployMain:restartPUInstance:62 - done
+20:05:41,534  INFO main HotRedeployMain:restartPUInstance:55 - restarting instance 1 on EVBYMINSD48AA.minsk.epam.com[10.6.132.93] GSC PID:31791 mode:backup...
+20:05:45,545  INFO main HotRedeployMain:restartPUInstance:62 - done
+20:05:45,546  INFO main HotRedeployMain:restartPUInstance:55 - restarting instance 1 on EVBYMINSD48AA.minsk.epam.com[10.6.132.93] GSC PID:31794 mode:primary...
+20:05:55,314  INFO main HotRedeployMain:restartPUInstance:62 - done
+20:05:55,314  INFO main HotRedeployMain:restartPUInstance:55 - restarting instance 2 on EVBYMINSD48AA.minsk.epam.com[10.6.132.93] GSC PID:31791 mode:primary...
+20:06:05,015  INFO main HotRedeployMain:restartPUInstance:62 - done
+20:06:05,033  INFO main HotRedeployMain:main:42 - Hot redeploy completed successfully
 ```
 
 If there are any problems during the hot-redeploy, you will see an error message and description of the problem:
 ```sh
-17:25:07,132  INFO main HotRedeployMain:checkFiles:109 - Please place new files on all GSM machines and try again.
-17:25:07,136  INFO main HotRedeployMain:checkFiles:110 - Hot redeploy is FAILURE
+20:11:27,861  INFO main HotRedeployMain:checkFiles:76 - Please place new files on all GSM machines and try again.
+20:11:27,864  INFO main HotRedeployMain:checkFiles:77 - Hot redeploy failed
 ```
 
 All details about hot-redeploy process you can see in `hot-redeploy.log` file.
