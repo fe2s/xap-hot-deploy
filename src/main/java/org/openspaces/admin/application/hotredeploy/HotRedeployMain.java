@@ -53,7 +53,6 @@ public class HotRedeployMain {
     }
 
 
-
     /**
      * Check with the user if new files placed on all GSM machines.
      */
@@ -125,7 +124,8 @@ public class HotRedeployMain {
 
     /**
      * Authorize user, if secure is turn on.
-     * @param args command-line arguments.
+     *
+     * @param args         command-line arguments.
      * @param adminFactory current admin factory.
      */
     private static void authorize(String[] args, AdminFactory adminFactory) {
@@ -139,6 +139,7 @@ public class HotRedeployMain {
 
     /**
      * Check if all command-line arguments were entered.
+     *
      * @param args command-line arguments
      */
     private static void checkArgs(String[] args) {
@@ -151,8 +152,9 @@ public class HotRedeployMain {
 
     /**
      * Discover all processing unit instances.
-     * @param admin current admin
-     * @param puToRestart name of restarting processing unit
+     *
+     * @param admin             current admin
+     * @param puToRestart       name of restarting processing unit
      * @param identifyPuTimeout timeout for pu discovering
      * @return
      */
@@ -172,7 +174,8 @@ public class HotRedeployMain {
 
     /**
      * Restart all processing unit instances.
-     * @param puInstances discovered pu instances
+     *
+     * @param puInstances    discovered pu instances
      * @param restartTimeout timeout for restarting pu instances
      */
     private static void restartAllInstances(ProcessingUnitInstance[] puInstances, Long restartTimeout, ExecutorService backupService, ExecutorService primaryService) {
@@ -180,7 +183,7 @@ public class HotRedeployMain {
         for (ProcessingUnitInstance puInstance : puInstances) {
 
             if (puInstance.getSpaceInstance().getMode() == SpaceMode.BACKUP) {
-                    backupService.submit(new RestartInstance(puInstance, restartTimeout));
+                backupService.submit(new RestartInstance(puInstance, restartTimeout));
             }
         }
         shutDownAndWait(backupService);
@@ -196,16 +199,15 @@ public class HotRedeployMain {
 
     /**
      * Shutdown threads and wait for terminate.
+     *
      * @param service executor service
      */
-    private static void shutDownAndWait(ExecutorService service){
+    private static void shutDownAndWait(ExecutorService service) {
         service.shutdown();
-        while (!service.isTerminated()){
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                log.error(e);
-            }
+        try {
+            while (!service.awaitTermination(10, TimeUnit.MINUTES)) { }
+        } catch (InterruptedException e) {
+            log.error(e);
         }
     }
 }
