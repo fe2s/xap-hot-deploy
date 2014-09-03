@@ -9,6 +9,8 @@ import org.openspaces.admin.pu.ProcessingUnit;
 import org.openspaces.admin.pu.ProcessingUnitInstance;
 
 import java.io.Console;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class HotRedeployMain {
@@ -36,31 +38,21 @@ public class HotRedeployMain {
         ProcessingUnitInstance[] puInstances = identifyPuInstances(admin, puToRestart, identifyPuTimeout);
         identSpaceMode(puInstances, identifySpaceModeTimeout);
         Thread.sleep(1000);
-        checkBackups(puInstances);
-        restartAllInstances(puInstances, restartAndWaitTimeout);
+
+        int backupsAmount = checkBackups(puInstances);
+        int primariesAmount = puInstances.length - backupsAmount;
+
+        ExecutorService backupService = Executors.newFixedThreadPool(backupsAmount);
+        ExecutorService primaryService = Executors.newFixedThreadPool(primariesAmount);
+
+        restartAllInstances(puInstances, restartAndWaitTimeout, backupService, primaryService);
+
         admin.close();
         log.info(SUCCESS);
         System.exit(0);
     }
 
-    /**
-     * Restart certain processing unit instance.
-     *
-     * @param pi                     processing unit instance.
-     * @param restartAndWaitTimeout  time out for restarting instance.
-     */
-    private static void restartPUInstance(
-            ProcessingUnitInstance pi, long restartAndWaitTimeout) {
-        final String instStr = pi.getSpaceInstance().getMode() != SpaceMode.PRIMARY ? "backup" : "primary";
-        log.info("restarting instance " + pi.getInstanceId()
-                + " on " + pi.getMachine().getHostName() + "["
-                + pi.getMachine().getHostAddress() + "] GSC PID:"
-                + pi.getVirtualMachine().getDetails().getPid() + " mode:"
-                + instStr + "...");
 
-        pi = pi.restartAndWait(restartAndWaitTimeout, TimeUnit.SECONDS);
-        log.info("done");
-    }
 
     /**
      * Check with the user if new files placed on all GSM machines.
@@ -84,14 +76,14 @@ public class HotRedeployMain {
      *
      * @param puInstances discovered processing unit instances.
      */
-    private static void checkBackups(ProcessingUnitInstance[] puInstances) {
-        Boolean findBackup = false;
+    private static int checkBackups(ProcessingUnitInstance[] puInstances) {
+        int findBackups = 0;
         for (ProcessingUnitInstance instance : puInstances) {
             if (instance.getSpaceInstance().getMode() == SpaceMode.BACKUP) {
-                findBackup = true;
+                findBackups++;
             }
         }
-        if (!findBackup) {
+        if (findBackups == 0) {
             System.out.println("No backups find. ALL SPACE DATA WILL BE LOST. Do you want to continue? [y]es, [n]o:");
             String answer = console.readLine();
             while (!(("y".equals(answer)) || ("n".equals(answer)))) {
@@ -103,6 +95,7 @@ public class HotRedeployMain {
                 System.exit(1);
             }
         }
+        return findBackups;
     }
 
     /**
@@ -180,20 +173,38 @@ public class HotRedeployMain {
     /**
      * Restart all processing unit instances.
      * @param puInstances discovered pu instances
-     * @param restartAndWaitTimeout timeout for restarting pu instances
+     * @param restartTimeout timeout for restarting pu instances
      */
-    private static void restartAllInstances(ProcessingUnitInstance[] puInstances, Long restartAndWaitTimeout) {
+    private static void restartAllInstances(ProcessingUnitInstance[] puInstances, Long restartTimeout, ExecutorService backupService, ExecutorService primaryService) {
         // restart all backups
         for (ProcessingUnitInstance puInstance : puInstances) {
 
             if (puInstance.getSpaceInstance().getMode() == SpaceMode.BACKUP) {
-                restartPUInstance(puInstance, restartAndWaitTimeout);
+                    backupService.submit(new RestartInstance(puInstance, restartTimeout));
             }
         }
+        shutDownAndWait(backupService);
+
         // restart all primaries
         for (ProcessingUnitInstance puInstance : puInstances) {
             if (puInstance.getSpaceInstance().getMode() == SpaceMode.PRIMARY) {
-                restartPUInstance(puInstance, restartAndWaitTimeout);
+                primaryService.submit(new RestartInstance(puInstance, restartTimeout));
+            }
+        }
+        shutDownAndWait(primaryService);
+    }
+
+    /**
+     * Shutdown threads and wait for terminate.
+     * @param service executor service
+     */
+    private static void shutDownAndWait(ExecutorService service){
+        service.shutdown();
+        while (!service.isTerminated()){
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                log.error(e);
             }
         }
     }
