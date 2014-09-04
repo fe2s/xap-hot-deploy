@@ -20,10 +20,5 @@
             <destName>properties.sh</destName>
             <outputDirectory>/</outputDirectory>
         </file>
-        <file>
-            <source>src/main/resources/readme.txt</source>
-            <destName>readme.txt</destName>
-            <outputDirectory>/</outputDirectory>
-        </file>
     </files>
 </assembly>
