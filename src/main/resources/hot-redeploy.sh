@@ -36,7 +36,7 @@ done
 
 args="-pun $PU_NAME -put $IDENT_PU_TIMEOUT -smt $IDENT_SPACE_MODE_TIMEOUT"
 
-if [ "x$GIGASPACES_LOCATORS" = "x" ]; then
+if [ "x$GIGASPACES_LOCATORS" != "x" ]; then
     args="$args -gsl $GIGASPACES_LOCATORS"
 fi
 
