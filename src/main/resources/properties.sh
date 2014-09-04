@@ -25,9 +25,6 @@ IDENT_PU_TIMEOUT="10"
 # timeout for identify space mode (in seconds), e.g. "10"
 IDENT_SPACE_MODE_TIMEOUT="10"
 
-# timeout for restarting PU (in seconds), e.g. "10"
-RESTART_TIMEOUT="10"
-
 # set "true" if space secured, set "false" if space not secured
 IS_SECURED="false"
 
