@@ -1,7 +1,6 @@
 package org.openspaces.admin.application.hotredeploy;
 
 import com.gigaspaces.cluster.activeelection.SpaceMode;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.openspaces.admin.Admin;
@@ -10,9 +9,6 @@ import org.openspaces.admin.pu.ProcessingUnit;
 import org.openspaces.admin.pu.ProcessingUnitInstance;
 
 import java.io.Console;
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -28,7 +24,7 @@ public class HotRedeployMain {
     private static String lookupGroup = null;
     private static Long identifyPuTimeout;
     private static Long identifySpaceModeTimeout;
-    private static boolean isSecure = false;
+    private static boolean isSecured = false;
 
 
     public static void main(String[] args) throws InterruptedException {
@@ -144,7 +140,6 @@ public class HotRedeployMain {
      * @param adminFactory current admin factory.
      */
     private static void authorize(String[] args, AdminFactory adminFactory) {
-        boolean isSecured = args.length >= 7 && Boolean.parseBoolean(args[6]);
         if (isSecured) {
             String user = console.readLine("%s", "User: ");
             String password = String.valueOf(console.readPassword("%s", "Password: "));
@@ -176,7 +171,7 @@ public class HotRedeployMain {
             } else if ("-smt".equals(key) || ("-space_mode_timeout".equals(key))) {
                 identifySpaceModeTimeout = Long.parseLong(parseValue(key, args[i + 1], length, i));
             } else if ("-s".equals(key) || ("-secured".equals(key))) {
-                isSecure = Boolean.getBoolean(parseValue(key, args[i + 1], length, i));
+                isSecured = Boolean.getBoolean(parseValue(key, args[i + 1], length, i));
             }
         }
         log.info("Pu to restart: " + puToRestart);
@@ -184,7 +179,7 @@ public class HotRedeployMain {
         log.info("Lookup group: " + lookupGroup);
         log.info("Timeout for identify pu: " + identifyPuTimeout);
         log.info("Timeout for identify space mode: " + identifySpaceModeTimeout);
-        log.info("Secured: " + isSecure);
+        log.info("Secured: " + isSecured);
     }
 
     private static String parseValue(String key, String value, int length, int i) {
