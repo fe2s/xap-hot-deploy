@@ -179,6 +179,12 @@ public class HotRedeployMain {
                 isSecure = Boolean.getBoolean(parseValue(key, args[i + 1], length, i));
             }
         }
+        log.info("Pu to restart: " + puToRestart);
+        log.info("Locator: " + locator);
+        log.info("Lookup group: " + lookupGroup);
+        log.info("Timeout for identify pu: " + identifyPuTimeout);
+        log.info("Timeout for identify space mode: " + identifySpaceModeTimeout);
+        log.info("Secured: " + isSecure);
     }
 
     private static String parseValue(String key, String value, int length, int i) {
