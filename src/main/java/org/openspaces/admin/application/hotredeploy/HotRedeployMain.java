@@ -25,6 +25,7 @@ public class HotRedeployMain {
     private static Long identifyPuTimeout;
     private static Long identifySpaceModeTimeout;
     private static boolean isSecured = false;
+    private static boolean doubleRestart = false;
 
 
     public static void main(String[] args) throws InterruptedException {
@@ -50,13 +51,16 @@ public class HotRedeployMain {
         identSpaceMode(puInstances, identifySpaceModeTimeout);
         Thread.sleep(1000);
 
-        int backupsAmount = checkBackups(puInstances);
-        int primariesAmount = puInstances.length - backupsAmount;
+        int backupsThreads = checkBackups(puInstances);
+        int primariesThreads = puInstances.length - backupsThreads;
 
-        ExecutorService backupService = Executors.newFixedThreadPool(backupsAmount);
-        ExecutorService primaryService = Executors.newFixedThreadPool(primariesAmount);
+        ExecutorService backupService = Executors.newFixedThreadPool(backupsThreads);
+        if (doubleRestart) {
+            primariesThreads = 1;
+        }
+        ExecutorService primaryService = Executors.newFixedThreadPool(primariesThreads);
 
-        restartAllInstances(puInstances, backupService, primaryService);
+        restartAllInstances(puInstances, backupService, primaryService,identifySpaceModeTimeout, admin);
 
         admin.close();
         log.info(SUCCESS);
@@ -171,7 +175,11 @@ public class HotRedeployMain {
             } else if ("-smt".equals(key) || ("-space_mode_timeout".equals(key))) {
                 identifySpaceModeTimeout = Long.parseLong(parseValue(key, args[i + 1], length, i));
             } else if ("-s".equals(key) || ("-secured".equals(key))) {
-                isSecured = Boolean.getBoolean(parseValue(key, args[i + 1], length, i));
+                String string = parseValue(key, args[i + 1], length, i);
+                log.info(string);
+                isSecured = Boolean.parseBoolean(string);
+            } else if ("-dr".equals(key) || ("-double_restart".equals(key))) {
+                doubleRestart = Boolean.parseBoolean(parseValue(key, args[i + 1], length, i));
             }
         }
         log.info("Pu to restart: " + puToRestart);
@@ -180,6 +188,7 @@ public class HotRedeployMain {
         log.info("Timeout for identify pu: " + identifyPuTimeout);
         log.info("Timeout for identify space mode: " + identifySpaceModeTimeout);
         log.info("Secured: " + isSecured);
+        log.info("Double restart: " + doubleRestart);
     }
 
     private static String parseValue(String key, String value, int length, int i) {
@@ -212,7 +221,7 @@ public class HotRedeployMain {
             System.exit(1);
         }
         // Wait for all the members to be discovered
-        processingUnit.waitFor(processingUnit.getTotalNumberOfInstances());
+        processingUnit.waitFor(processingUnit.getPlannedNumberOfInstances());
         return processingUnit.getInstances();
     }
 
@@ -223,9 +232,15 @@ public class HotRedeployMain {
      * @param backupService  executor service for restart all backups at the same time
      * @param primaryService executor service for restart all primaries at the same time
      */
-    private static void restartAllInstances(ProcessingUnitInstance[] puInstances, ExecutorService backupService, ExecutorService primaryService) {
+    private static void restartAllInstances(ProcessingUnitInstance[] puInstances, ExecutorService backupService, ExecutorService primaryService, Long identifySpaceModeTimeout, Admin admin) {
         restartBackups(puInstances, backupService);
         restartPrimaries(puInstances, primaryService);
+        if (doubleRestart) {
+            puInstances = identifyPuInstances(admin, puToRestart, identifyPuTimeout);
+            identSpaceMode(puInstances, identifySpaceModeTimeout);
+            primaryService = Executors.newFixedThreadPool(1);
+            restartPrimaries(puInstances, primaryService);
+        }
     }
 
     /**

@@ -34,7 +34,7 @@ do
     ssh $SSS_USER@$host unzip $GIGASPACES_LOCATION/deploy/$PU_FILE_NAME -d $GIGASPACES_LOCATION/deploy/$PU_NAME
 done
 
-args="-pun $PU_NAME -put $IDENT_PU_TIMEOUT -smt $IDENT_SPACE_MODE_TIMEOUT"
+args="-pun $PU_NAME -put $IDENT_PU_TIMEOUT -smt $IDENT_SPACE_MODE_TIMEOUT -dr $DOUBLE_RESTART"
 
 if [ "x$GIGASPACES_LOCATORS" != "x" ]; then
     args="$args -gsl $GIGASPACES_LOCATORS"

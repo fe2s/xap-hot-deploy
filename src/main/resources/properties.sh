@@ -28,3 +28,5 @@ IDENT_SPACE_MODE_TIMEOUT="10"
 # set "true" if space secured, set "false" if space not secured
 IS_SECURED="false"
 
+# set true if redeploy need double restarting for primaries
+DOUBLE_RESTART="true"
