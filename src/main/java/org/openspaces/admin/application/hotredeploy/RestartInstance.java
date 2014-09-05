@@ -25,7 +25,7 @@ public class RestartInstance implements Runnable {
     /**
      * Restart certain processing unit instance.
      *
-     * @param pi                     processing unit instance.
+     * @param pi processing unit instance.
      */
     private void restartPUInstance(
             ProcessingUnitInstance pi) {

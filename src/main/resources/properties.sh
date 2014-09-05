@@ -28,5 +28,5 @@ IDENT_SPACE_MODE_TIMEOUT="10"
 # set "true" if space secured, set "false" if space not secured
 IS_SECURED="false"
 
-# set true if redeploy need double restarting for primaries
+# set "true" if all instances should placed in "original" vm after redeploy
 DOUBLE_RESTART="true"
