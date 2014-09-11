@@ -6,7 +6,7 @@ import org.apache.log4j.Logger;
 import org.openspaces.admin.Admin;
 import org.openspaces.admin.pu.ProcessingUnitInstance;
 
-import java.io.Console;
+import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -43,11 +43,11 @@ public class RestartAll {
         }
         if (findBackups == 0) {
             System.out.println("No backups find. ALL SPACE DATA WILL BE LOST. Do you want to continue? [y]es, [n]o:");
-            Console console = System.console();
-            String answer = console.readLine();
+            Scanner sc = new Scanner(System.in);
+            String answer = sc.next();
             while (!(("y".equals(answer)) || ("n".equals(answer)))) {
                 System.out.println("Error: invalid response [" + answer + "]. Try again.");
-                answer = console.readLine();
+                answer = sc.next();
             }
             if ("n".equals(answer)) {
                 log.info(HotRedeployMain.FAILURE);
