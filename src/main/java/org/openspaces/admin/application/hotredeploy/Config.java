@@ -1,25 +1,23 @@
 package org.openspaces.admin.application.hotredeploy;
 
-import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 /**
- * Created by Anna_Babich on 05.09.2014.
+ * @author Anna_Babich
  */
-public class ArgsStorage {
-    public static Logger log = LogManager.getLogger(ArgsStorage.class);
+public class Config {
+    public static Logger log = LogManager.getLogger(Config.class);
 
     @Parameter
     private List<String> parameters = new ArrayList<String>();
 
     @Parameter(names = { "-pun", "-pu_name" }, description = "Name of restarting processing unit")
-    private String puToRestart;
+    private List<String> puToRestart = new ArrayList<String>();
 
     @Parameter(names = { "-gsl", "-gs_locator" }, description = "Locator")
     private String locator = null;
@@ -39,7 +37,7 @@ public class ArgsStorage {
     @Parameter(names = { "-dr", "-double_restart" }, description = "Is double restart required", arity = 1)
     private boolean doubleRestart = false;
 
-    public String getPuToRestart() {
+    public List<String> getPuToRestart() {
         return puToRestart;
     }
 

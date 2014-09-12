@@ -6,14 +6,14 @@ import org.apache.log4j.Logger;
 import org.openspaces.admin.pu.ProcessingUnitInstance;
 
 /**
- * Restart pu instance in new thread.
+ * @author Anna_Babich
  */
-public class RestartInstance implements Runnable {
-    public static Logger log = LogManager.getLogger(RestartInstance.class);
+public class PuInstanceRestarter implements Runnable {
+    public static Logger log = LogManager.getLogger(PuInstanceRestarter.class);
 
     private ProcessingUnitInstance instance;
 
-    public RestartInstance(ProcessingUnitInstance instance){
+    public PuInstanceRestarter(ProcessingUnitInstance instance){
         this.instance = instance;
     }
 

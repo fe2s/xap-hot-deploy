@@ -1,6 +1,5 @@
 package org.openspaces.admin.application.hotredeploy;
 
-import com.beust.jcommander.JCommander;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -11,10 +10,9 @@ public class HotRedeployMain {
     public static Logger log = LogManager.getLogger(HotRedeployMain.class);
 
     public static void main(String[] args) throws InterruptedException {
-        ArgsStorage argsStorage = new ArgsStorage();
-        StorageInitializer.init(argsStorage, args);
-        RestartAll restartAll = new RestartAll(argsStorage);
-        restartAll.restart();
+        Config config = ConfigInitializer.init(args);
+        PuManager puManager = new PuManager(config);
+        puManager.restartAllPUs();
         log.info(SUCCESS);
         System.exit(0);
     }

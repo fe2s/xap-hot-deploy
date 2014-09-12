@@ -3,7 +3,7 @@ package org.openspaces.admin.application.hotredeploy;
 import com.gigaspaces.cluster.activeelection.SpaceMode;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.openspaces.admin.Admin;
+import org.openspaces.admin.pu.ProcessingUnit;
 import org.openspaces.admin.pu.ProcessingUnitInstance;
 
 import java.util.Scanner;
@@ -12,21 +12,42 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by Anna_Babich on 05.09.2014.
+ * @author Anna_Babich
  */
-public class RestartAll {
+public class StatefulPuRestarter extends PuRestarter {
 
-    public static Logger log = LogManager.getLogger(RestartAll.class);
-    private ArgsStorage argsStorage;
-    private PuManager puManager;
+    public static Logger log = LogManager.getLogger(StatefulPuRestarter.class);
+    private Config config;
 
     /**
      * Constructor.
-     * @param argsStorage command line args.
+     * @param config command line args.
      */
-    public RestartAll(ArgsStorage argsStorage){
-        this.argsStorage = argsStorage;
-        puManager = new PuManager(argsStorage);
+    public StatefulPuRestarter(Config config){
+        this.config = config;
+    }
+
+    /**
+     * Restart processing unit
+     * @param processingUnit current pu (stateful)
+     */
+    public void restart(ProcessingUnit processingUnit){
+        ProcessingUnitInstance[] puInstances = getPuInstances(processingUnit);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            log.error(e.getMessage());
+        }
+        int backupsThreads = checkBackups(puInstances);
+        int primariesThreads = puInstances.length - backupsThreads;
+
+        ExecutorService backupService = Executors.newFixedThreadPool(backupsThreads);
+        // if return to original state needed, primaries should restart one by one.
+        if (config.isDoubleRestart()) {
+            primariesThreads = 1;
+        }
+        ExecutorService primaryService = Executors.newFixedThreadPool(primariesThreads);
+        restartAllInstances(processingUnit, backupService, primaryService);
     }
 
     /**
@@ -50,7 +71,7 @@ public class RestartAll {
                 answer = sc.next();
             }
             if ("n".equals(answer)) {
-                log.info(HotRedeployMain.FAILURE);
+                log.error(HotRedeployMain.FAILURE);
                 System.exit(1);
             }
         }
@@ -60,15 +81,16 @@ public class RestartAll {
     /**
      * Restart all processing unit instances.
      *
-     * @param puInstances    discovered pu instances.
      * @param backupService  executor service for restart all backups at the same time
      * @param primaryService executor service for restart all primaries at the same time
      */
-    private void restartAllInstances(ProcessingUnitInstance[] puInstances, ExecutorService backupService, ExecutorService primaryService) {
+    private void restartAllInstances(ProcessingUnit processingUnit, ExecutorService backupService, ExecutorService primaryService) {
+        log.info("Restarting pu " + processingUnit.getName() + " with type " + processingUnit.getType());
+        ProcessingUnitInstance [] puInstances = getPuInstances(processingUnit);
         restartBackups(puInstances, backupService);
         restartPrimaries(puInstances, primaryService);
-        if (argsStorage.isDoubleRestart()) {
-            puInstances = puManager.getPuInstances();
+        if (config.isDoubleRestart()) {
+            puInstances = getPuInstances(processingUnit);
             primaryService = Executors.newFixedThreadPool(1);
             restartPrimaries(puInstances, primaryService);
         }
@@ -84,7 +106,7 @@ public class RestartAll {
         for (ProcessingUnitInstance puInstance : puInstances) {
 
             if (puInstance.getSpaceInstance().getMode() == SpaceMode.BACKUP) {
-                backupService.submit(new RestartInstance(puInstance));
+                backupService.submit(new PuInstanceRestarter(puInstance));
             }
         }
         shutDownAndWait(backupService);
@@ -99,7 +121,7 @@ public class RestartAll {
     private void restartPrimaries(ProcessingUnitInstance[] puInstances, ExecutorService primaryService) {
         for (ProcessingUnitInstance puInstance : puInstances) {
             if (puInstance.getSpaceInstance().getMode() == SpaceMode.PRIMARY) {
-                primaryService.submit(new RestartInstance(puInstance));
+                primaryService.submit(new PuInstanceRestarter(puInstance));
             }
         }
         shutDownAndWait(primaryService);
@@ -120,25 +142,37 @@ public class RestartAll {
         }
     }
 
-    public void restart(){
-        Admin admin = puManager.createAdmin();
-        ProcessingUnitInstance[] puInstances = puManager.getPuInstances();
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            log.error(e.getMessage());
-        }
-        int backupsThreads = checkBackups(puInstances);
-        int primariesThreads = puInstances.length - backupsThreads;
+    /**
+     * Identify pu instances and wait for identify space mode of each instances.
+     * @return discovered pu instances
+     */
+    public ProcessingUnitInstance[] getPuInstances(ProcessingUnit processingUnit){
+        ProcessingUnitInstance[] puInstances = identifyPuInstances(processingUnit);
+        identSpaceMode(puInstances);
+        return puInstances;
+    }
 
-        ExecutorService backupService = Executors.newFixedThreadPool(backupsThreads);
-        // if return to original state needed, primaries should restart one by one.
-        if (argsStorage.isDoubleRestart()) {
-            primariesThreads = 1;
-        }
-        ExecutorService primaryService = Executors.newFixedThreadPool(primariesThreads);
-        restartAllInstances(puInstances, backupService, primaryService);
-        admin.close();
+    /**
+     * Discover space mode for all pu instances.
+     *
+     * @param puInstances discovered processing unit instances.
+     */
+    private void identSpaceMode(ProcessingUnitInstance[] puInstances) {
+        Long timeout = System.currentTimeMillis() + config.getIdentifySpaceModeTimeout() * 1000;
+        boolean keepTrying = true;
 
+        while (keepTrying) {
+            if (System.currentTimeMillis() >= timeout) {
+                log.error("can't identify space mode");
+                log.error(HotRedeployMain.FAILURE);
+                System.exit(1);
+            }
+            keepTrying = false;
+            for (ProcessingUnitInstance instance : puInstances) {
+                if ((instance.getSpaceInstance() == null) || (instance.getSpaceInstance().getMode() == SpaceMode.NONE)) {
+                    keepTrying = true;
+                }
+            }
+        }
     }
 }
