@@ -21,7 +21,7 @@ public abstract class PuRestarter {
         if (processingUnit == null) {
             log.error("can't get PU instances for " + processingUnit.getName());
             log.error(HotRedeployMain.FAILURE);
-            System.exit(1);
+            throw new HotRedeployException();
         }
         // Wait for all the members to be discovered
         processingUnit.waitFor(processingUnit.getPlannedNumberOfInstances());

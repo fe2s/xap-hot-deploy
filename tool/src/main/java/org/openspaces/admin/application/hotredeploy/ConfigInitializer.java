@@ -46,7 +46,7 @@ public class ConfigInitializer {
         if ("n".equals(answer)) {
             log.error("Please place new files on all GSM machines and try again.");
             log.error(HotRedeployMain.FAILURE);
-            System.exit(1);
+            throw new HotRedeployException();
         }
     }
 }

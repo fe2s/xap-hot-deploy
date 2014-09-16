@@ -72,7 +72,7 @@ public class StatefulPuRestarter extends PuRestarter {
             }
             if ("n".equals(answer)) {
                 log.error(HotRedeployMain.FAILURE);
-                System.exit(1);
+                throw new HotRedeployException();
             }
         }
         return findBackups;
@@ -165,7 +165,7 @@ public class StatefulPuRestarter extends PuRestarter {
             if (System.currentTimeMillis() >= timeout) {
                 log.error("can't identify space mode");
                 log.error(HotRedeployMain.FAILURE);
-                System.exit(1);
+                throw new HotRedeployException();
             }
             keepTrying = false;
             for (ProcessingUnitInstance instance : puInstances) {

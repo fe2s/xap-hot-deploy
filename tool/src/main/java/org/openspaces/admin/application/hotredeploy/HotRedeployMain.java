@@ -15,6 +15,5 @@ public class HotRedeployMain {
         PuManager puManager = new PuManager(config);
         puManager.restartAllPUs();
         log.info(SUCCESS);
-        System.exit(0);
     }
 }
