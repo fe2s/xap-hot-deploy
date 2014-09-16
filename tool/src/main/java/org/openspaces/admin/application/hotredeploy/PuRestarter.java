@@ -6,7 +6,7 @@ import org.openspaces.admin.pu.ProcessingUnit;
 import org.openspaces.admin.pu.ProcessingUnitInstance;
 
 /**
- * @autor Anna_Babich
+ * @author Anna_Babich
  */
 public abstract class PuRestarter {
 
@@ -19,9 +19,10 @@ public abstract class PuRestarter {
      */
     protected ProcessingUnitInstance[] identifyPuInstances(ProcessingUnit processingUnit) {
         if (processingUnit == null) {
-            log.error("can't get PU instances for " + processingUnit.getName());
+            String cause = "can't get PU instances";
+            log.error(cause);
             log.error(HotRedeployMain.FAILURE);
-            throw new HotRedeployException();
+            throw new HotRedeployException(cause);
         }
         // Wait for all the members to be discovered
         processingUnit.waitFor(processingUnit.getPlannedNumberOfInstances());

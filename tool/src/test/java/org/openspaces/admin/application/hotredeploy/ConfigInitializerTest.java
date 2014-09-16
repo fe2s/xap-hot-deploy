@@ -6,7 +6,7 @@ import static org.junit.Assert.*;
 
 
 /**
- * @autor Anna_Babich
+ * @author Anna_Babich
  */
 public class ConfigInitializerTest {
     public static final String TIMEOUT = "100";

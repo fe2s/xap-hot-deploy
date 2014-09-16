@@ -44,9 +44,10 @@ public class ConfigInitializer {
             answer = sc.next();
         }
         if ("n".equals(answer)) {
-            log.error("Please place new files on all GSM machines and try again.");
+            String cause = "Please place new files on all GSM machines and try again.";
+            log.error(cause);
             log.error(HotRedeployMain.FAILURE);
-            throw new HotRedeployException();
+            throw new HotRedeployException(cause);
         }
     }
 }

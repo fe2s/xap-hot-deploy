@@ -71,8 +71,10 @@ public class StatefulPuRestarter extends PuRestarter {
                 answer = sc.next();
             }
             if ("n".equals(answer)) {
+                String cause = "Hot redeploy was terminated, because no backups find";
+                log.error(cause);
                 log.error(HotRedeployMain.FAILURE);
-                throw new HotRedeployException();
+                throw new HotRedeployException(cause);
             }
         }
         return findBackups;
@@ -163,9 +165,10 @@ public class StatefulPuRestarter extends PuRestarter {
 
         while (keepTrying) {
             if (System.currentTimeMillis() >= timeout) {
-                log.error("can't identify space mode");
+                String cause = "can't identify space mode";
+                log.error(cause);
                 log.error(HotRedeployMain.FAILURE);
-                throw new HotRedeployException();
+                throw new HotRedeployException(cause);
             }
             keepTrying = false;
             for (ProcessingUnitInstance instance : puInstances) {

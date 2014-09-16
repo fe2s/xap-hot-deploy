@@ -8,7 +8,7 @@
         <version>0.0.1-SNAPSHOT</version>
         <artifactId>xap-hot-redeploy</artifactId>
     </parent>
-    <groupId>org.openspaces</groupId>
+
     <version>0.0.1-SNAPSHOT</version>
     <artifactId>XAP-hot-redeploy</artifactId>
 
@@ -49,6 +49,34 @@
             <version>4.0.5.RELEASE</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.0</version>
+        </dependency>
+        <dependency>
+            <artifactId>gs-runtime</artifactId>
+            <groupId>com.gigaspaces</groupId>
+            <version>${gigaspacesVersion}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <artifactId>gs-openspaces</artifactId>
+            <groupId>com.gigaspaces</groupId>
+            <version>${gigaspacesVersion}</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jacorb</artifactId>
+                    <groupId>jacorb</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>ant</artifactId>
+                    <groupId>ant</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
 
     </dependencies>
 

@@ -65,7 +65,7 @@ public class PuManager {
             if (processingUnit.getType() == ProcessingUnitType.STATEFUL){
                 puRestarter = new StatefulPuRestarter(config);
             } else {
-                puRestarter = new StatelessfulPuRestarter();
+                puRestarter = new StatelessPuRestarter();
             }
             puRestarter.restart(processingUnit);
         }

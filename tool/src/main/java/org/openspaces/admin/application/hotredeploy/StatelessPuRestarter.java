@@ -6,11 +6,11 @@ import org.openspaces.admin.pu.ProcessingUnit;
 import org.openspaces.admin.pu.ProcessingUnitInstance;
 
 /**
- * @autor Anna_Babich
+ * @author Anna_Babich
  */
-public class StatelessfulPuRestarter extends PuRestarter {
+public class StatelessPuRestarter extends PuRestarter {
 
-    public static Logger log = LogManager.getLogger(StatelessfulPuRestarter.class);
+    public static Logger log = LogManager.getLogger(StatelessPuRestarter.class);
 
     public void restart(ProcessingUnit processingUnit){
         ProcessingUnitInstance[] puInstances = identifyPuInstances(processingUnit);
@@ -21,7 +21,7 @@ public class StatelessfulPuRestarter extends PuRestarter {
         }
         for (ProcessingUnitInstance puInstance : puInstances) {
             log.info("Restarting pu " + processingUnit.getName() + " with type " + processingUnit.getType());
-            puInstance = puInstance.restartAndWait();
+            puInstance.restartAndWait();
             log.info("done");
         }
     }

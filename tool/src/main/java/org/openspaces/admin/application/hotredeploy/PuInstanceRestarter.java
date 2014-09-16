@@ -27,8 +27,7 @@ public class PuInstanceRestarter implements Runnable {
      *
      * @param pi processing unit instance.
      */
-    private void restartPUInstance(
-            ProcessingUnitInstance pi) {
+    private void restartPUInstance(ProcessingUnitInstance pi) {
         final String instStr = pi.getSpaceInstance().getMode() != SpaceMode.PRIMARY ? "backup" : "primary";
         log.info("restarting instance " + pi.getInstanceId()
                 + " on " + pi.getMachine().getHostName() + "["
@@ -36,7 +35,7 @@ public class PuInstanceRestarter implements Runnable {
                 + pi.getVirtualMachine().getDetails().getPid() + " mode:"
                 + instStr + "...");
 
-        pi = pi.restartAndWait();
+        pi.restartAndWait();
         log.info("done");
     }
 }

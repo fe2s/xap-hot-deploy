@@ -12,13 +12,35 @@
     <packaging>pom</packaging>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>test-pu</artifactId>
-    <groupId>org.openspaces</groupId>
     <version>0.0.1-SNAPSHOT</version>
     <modules>
         <module>v0</module>
         <module>v1</module>
         <module>common</module>
     </modules>
-
+    <dependencies>
+        <dependency>
+            <artifactId>gs-runtime</artifactId>
+            <groupId>com.gigaspaces</groupId>
+            <version>${gigaspacesVersion}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <artifactId>gs-openspaces</artifactId>
+            <groupId>com.gigaspaces</groupId>
+            <version>${gigaspacesVersion}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jacorb</artifactId>
+                    <groupId>jacorb</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>ant</artifactId>
+                    <groupId>ant</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
 
 </project>
