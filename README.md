@@ -21,7 +21,10 @@ Build
 For build use:
 
     mvn clean install 
+    
 It will create `XAP-hot-redeploy-0.0.1-SNAPSHOT.zip` file.
+Note, that tests will be skipped in this case. How to build with tests see in [Tests][Tests] section.
+
 
 Run
 ---
@@ -32,6 +35,22 @@ Run
 4. Copy jar file with new classes to the folder with .sh file.
 5. Configure options in `properties.sh` file.
 6. Run `XAP-hot-redeploy.sh` script.
+
+Parameters in `properties.sh` file.
+---
+
+| Option                   | Optional/required | Default value                        | Description                                                                                                                         |
+|--------------------------|-------------------|--------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| GSM_HOSTS                | required          | -                                    | Hosts on which GSM are located.                                                                                                     |
+| PU                       | required          | ( [space]=space.jar, [web]=web.war ) | Map with key value pairs, where key is processing unit name, value is name of file with new classes.                                |
+| SSS_USER                 | required          | "user"                               | Name of user on remote machine.                                                                                                     |
+| GIGASPACES_LOCATION      | required          | -                                    | Path to gigaspaces directory.                                                                                                       |
+| GIGASPACES_LOCATORS      | optional          | localhost                            | Gigaspaces locator.                                                                                                                 |
+| LOOKUP_GROUP             | optional          | Gigaspace default lookup group       | Lookup group                                                                                                                        |
+| IDENT_PU_TIMEOUT         | required          | "60"                                 | Timeout to identify processing unit (in seconds).                                                                                   |
+| IDENT_SPACE_MODE_TIMEOUT | required          | "60"                                 | Timeout to identify space mode (in seconds).                                                                                        |
+| IS_SECURED               | optional          | "false"                              | Set this parameter "true" if space is secured.                                                                                      |
+| DOUBLE_RESTART           | optional          | "false"                              | Set "true" if all instances should be placed in "original" vm after redeploy. When set to "true" primary instances restarted twice. |
 
 Results
 ---
@@ -70,24 +89,10 @@ If there are any problems during the hot-redeploy, you will see an error message
 20:11:27,864  INFO main HotRedeployMain:checkFiles:77 - Hot redeploy failed
 ```
 
-All details about hot-redeploy process you can see in `hot-redeploy.log` file.
+All details about hot-redeploy process you can see in `hot-redeploy.log` file.       |
 
+[Tests]: Tests
 
-Redeploy command options
----
-
-| Option                    | Optional/required | Default value                  | Description                                                                                                                                                      | Value format                |
-|---------------------------|-------------------|--------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------|
-| -pu, -pu_name             | required          | -                              | Name of the processing unit that should be redeployed.  It's possible to declare several instances.                                                              | -pu [pu name] -pu [pu name] |
-| -put, -pu_timeout         | required          | -                              | Timeout to identify processing unit (in seconds).                                                                                                                | -put [timeout]              |
-| -smt, -space_mode_timeout | required          | -                              | Timeout to identify space mode (in seconds).                                                                                                                     | -smt [timeout]              |
-| -gsl, -gs_locator         | optional          | localhost                      | Gigaspace locator                                                                                                                                                | -gsl [locator]              |
-| -gsg, -gs_group           | optional          | Gigaspace default lookup group | Lookup group                                                                                                                                                     | -gsg [lookup group]         |
-| -s, -secured              | optional          | "false"                        | Set this parameter "true" if space is secured.  "False" by default                                                                                               | -s true                     |
-| -dr, -double_restart      | optional          | "false"                        | Set "true" if all instances should be placed in "original" vm after redeploy.  When set to "true" primary instances restarted twice.  By default set to "false". | -dr true                    |
-
-Tests
----
 If you want to build tool with running tests use 
 ```
 mvn clean install -DskipTests=false
