@@ -46,4 +46,6 @@ fi
 for K in "${!MYMAP[@]}"; do echo $K; done
 echo $args
 
-java -classpath XAP-hot-redeploy.jar org.openspaces.admin.application.hotredeploy.HotRedeployMain $args 
+java -classpath XAP-hot-redeploy.jar org.openspaces.admin.application.hotredeploy.HotRedeployMain $args
+
+

@@ -19,7 +19,7 @@ LOOKUP_GROUP=
 # timeout for identify PU (in seconds), e.g. "60"
 IDENT_PU_TIMEOUT="60"
 
-# timeout for identify space mode (in seconds), e.g. "60"
+# timeout for identify space mode (in seconds), e.g. '60'
 IDENT_SPACE_MODE_TIMEOUT="60"
 
 # set "true" if space secured, set "false" if space not secured
