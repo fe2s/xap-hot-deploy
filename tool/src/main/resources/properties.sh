@@ -8,7 +8,7 @@ declare -A PU=( [space]=space.jar, [web]=web.war )
 SSS_USER="user"
 
 # path to gigaspace directory, e.g. "/home/user/gigaspaces-xap-premium-9.7.1-ga"
-GIGASPACES_LOCATION="/home/user/gigaspaces-xap-premium-10.0.0-ga/"
+GIGASPACES_LOCATION=
 
 # gigaspace locator to cluster, e.g. "127.0.0.1"
 GIGASPACES_LOCATORS=
