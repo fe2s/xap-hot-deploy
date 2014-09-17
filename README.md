@@ -12,7 +12,7 @@ New files will be copied to the deploy folder. After that application will defin
 
 Stateful PU restart.
 ---
-1. Tool define all processing unit instances and identify their space mode.
+1. Tool defines all processing unit instances and identifies their space mode.
 2. All backups restarted
 3. All primaries restarted. If 'double_restart' option enabled, primaries restarted twice to return to the original state.
 
