@@ -23,7 +23,6 @@ import java.io.*;
 import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
@@ -35,6 +34,7 @@ import static org.junit.Assert.assertNotNull;
  * - run gs-agent.sh/bat
  * - lookup group and locator should be set to default values
  * - properties should be set in config.properties file
+ * - make sure that there is no pu with name "space" deployed already
  *
  * @author Anna_Babich
  */
@@ -58,7 +58,7 @@ public class IntegrationTest {
             space = managers.deploy(new ProcessingUnitDeployment(puArchive));
             space.waitFor(4);
         } catch (AdminException e) {
-            throw new HotRedeployException("Unable to identify GSM or Space. Make sure you have default lookup group and locator", e);
+            throw new HotRedeployException("Unable to identify GSM or Space. Make sure you have default lookup group and locator. Make sure that there is no pu with name \"space\" deployed already", e);
         }
     }
 

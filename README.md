@@ -6,8 +6,15 @@ About
 This tool allows to refresh business logic without any system downtime and data loss (hot deploy).
 See [gigaspaces wiki] for details.
 
-Tool will copy new files in deploy folder. After that application will define all processing unit instances and identify their space mode.
-When all instances are defined, all backups will restart and then all primaries will restart. 
+Tool will restart all processing units, which defined by user.
+
+New files will be copied to the deploy folder. After that application will define all processing units and restart their.
+
+Reestar stateful processing unit.
+---
+1. Tooll define all processing unit instances and identify their space mode.
+2. Restat all backups
+3. If double restart is turn off, primaries would restarted the same time. If double restart option is turn on, primaries would restarted twice and one by one.
 
 Build
 ---
@@ -30,15 +37,31 @@ Results
 ---
 In case if there are no problems with hot-redeploy application you can see success message and details for restarting pu instances: 
 ```sh
-15:29:43,534  INFO pool-6-thread-1 RestartInstance:restartPUInstance:36 - restarting instance 1 on localhost GSC PID:29899 mode:backup...
-15:29:43,534  INFO pool-6-thread-2 RestartInstance:restartPUInstance:36 - restarting instance 2 on localhost GSC PID:29904 mode:backup...
-15:29:48,639  INFO pool-6-thread-1 RestartInstance:restartPUInstance:43 - done
-15:29:49,586  INFO pool-6-thread-2 RestartInstance:restartPUInstance:43 - done
-15:29:50,047  INFO pool-7-thread-1 RestartInstance:restartPUInstance:36 - restarting instance 1 on localhost GSC PID:29904 mode:primary...
-15:29:50,048  INFO pool-7-thread-2 RestartInstance:restartPUInstance:36 - restarting instance 2 on localhost GSC PID:29899 mode:primary...
-15:30:00,689  INFO pool-7-thread-1 RestartInstance:restartPUInstance:43 - done
-15:30:01,482  INFO pool-7-thread-2 RestartInstance:restartPUInstance:43 - done
-15:30:01,569  INFO main HotRedeployMain:main:51 - Hot redeploy completed successfully
+12:06:08,089  INFO main ConfigInitializer:init:25 - Pu to restart: [space, cinema, mirror]
+12:06:08,092  INFO main ConfigInitializer:init:26 - Locator: null
+12:06:08,095  INFO main ConfigInitializer:init:27 - Lookup group: null
+12:06:08,095  INFO main ConfigInitializer:init:28 - Timeout for identify pu: 100
+12:06:08,095  INFO main ConfigInitializer:init:29 - Timeout for identify space mode: 100
+12:06:08,095  INFO main ConfigInitializer:init:30 - Secured: false
+12:06:08,095  INFO main ConfigInitializer:init:31 - Double restart: true
+12:06:13,708  INFO main StatefulPuRestarter:restartAllInstances:90 - Restarting pu space with type STATEFUL
+12:06:13,710  INFO pool-6-thread-1 PuInstanceRestarter:restartPUInstance:32 - restarting instance 1 on 127.0.0.1[127.0.0.1] GSC PID:7260 mode:backup...
+12:06:13,710  INFO pool-6-thread-2 PuInstanceRestarter:restartPUInstance:32 - restarting instance 2 on 127.0.0.1[127.0.0.1] GSC PID:11464 mode:backup...
+12:06:26,546  INFO pool-6-thread-1 PuInstanceRestarter:restartPUInstance:39 - done
+12:06:28,906  INFO pool-6-thread-2 PuInstanceRestarter:restartPUInstance:39 - done
+12:06:28,970  INFO pool-7-thread-1 PuInstanceRestarter:restartPUInstance:32 - restarting instance 2 on 127.0.0.1[127.0.0.1] GSC PID:7260 mode:primary...
+12:06:40,881  INFO pool-7-thread-1 PuInstanceRestarter:restartPUInstance:39 - done
+12:06:40,881  INFO pool-7-thread-1 PuInstanceRestarter:restartPUInstance:32 - restarting instance 1 on 127.0.0.1[127.0.0.1] GSC PID:11464 mode:primary...
+12:06:51,631  INFO pool-7-thread-1 PuInstanceRestarter:restartPUInstance:39 - done
+12:06:52,644  INFO pool-8-thread-1 PuInstanceRestarter:restartPUInstance:32 - restarting instance 1 on 127.0.0.1[127.0.0.1] GSC PID:7260 mode:primary...
+12:07:05,719  INFO pool-8-thread-1 PuInstanceRestarter:restartPUInstance:39 - done
+12:07:05,719  INFO pool-8-thread-1 PuInstanceRestarter:restartPUInstance:32 - restarting instance 2 on 127.0.0.1[127.0.0.1] GSC PID:11464 mode:primary...
+12:07:16,390  INFO pool-8-thread-1 PuInstanceRestarter:restartPUInstance:39 - done
+12:07:17,433  INFO main StatelessPuRestarter:restart:23 - Restarting pu cinema with type WEB
+12:07:26,107  INFO main StatelessPuRestarter:restart:25 - done
+12:07:27,116  INFO main StatelessPuRestarter:restart:23 - Restarting pu mirror with type MIRROR
+12:07:33,929  INFO main StatelessPuRestarter:restart:25 - done
+12:07:33,945  INFO main HotRedeployMain:main:17 - Hot redeploy completed successfully
 ```
 
 If there are any problems during the hot-redeploy, you will see an error message and description of the problem:
@@ -48,6 +71,33 @@ If there are any problems during the hot-redeploy, you will see an error message
 ```
 
 All details about hot-redeploy process you can see in `hot-redeploy.log` file.
+
+
+Redeploy command options
+---
+
+| Option                     | Description                                                                                                                                                                        | Value format                              |
+|----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------|
+| -pu,  -pu_name             | Name of the processing unit that should be redeploy. Can be declare several times.                                                                                                 | -pu [pu name] -pu [pu name] -pu [pu name] |
+| -put,  -pu_timeout         | Timeout for identify processing unit (in seconds).                                                                                                                                 | -put [timeout]                            |
+| -smt,  -space_mode_timeout | Timeout for identify space mode (in seconds).                                                                                                                                      | -smt [timeout]                            |
+| -gsl,  -gs_locator         | Gigaspace locator to cluster                                                                                                                                                       | -gsl [locator]                            |
+| -gsg, -gs_group            | Lookup group                                                                                                                                                                       | -gsg [lookup group]                       |
+| -s,  -secured              | Set this parameter "true" if space is secured. Will set in "false" by default.                                                                                                     | -s [true]                                 |
+| -dr,  -double_restart      | Set "true" if all instances should placed in "original" vm after redeploy. When this parameter is "true" primary instances would restarted twice. Will set  in "false" by default. | -dr [true]                                |
+
+Tests
+---
+If you want to build tool with running tests use 
+```
+mvn clean install -DskipTests=false
+```
+** PREREQUISITES for running tests:**
+
+ * run gs-agent.sh/bat
+ * lookup group and locator should be set to default values
+ * properties should be set in config.properties file
+ * make sure that there is no pu with name "space" deployed already
 
 [gigaspaces wiki]:http://wiki.gigaspaces.com/wiki/display/XAP96/Deploying+onto+the+Service+Grid#DeployingontotheServiceGrid-HotDeploy
 [SSH login without password]:http://www.linuxproblem.org/art_9.html
