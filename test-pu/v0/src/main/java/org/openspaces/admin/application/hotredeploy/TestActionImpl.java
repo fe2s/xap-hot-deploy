@@ -6,7 +6,7 @@ import org.openspaces.remoting.RemotingService;
  * @author Anna_Babich
  */
 @RemotingService
-public class TestActionV0 implements TestAction{
+public class TestActionImpl implements TestAction{
 
     @Override
     public String doAction() {
