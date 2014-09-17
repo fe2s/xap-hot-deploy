@@ -6,15 +6,15 @@ About
 This tool allows to refresh business logic without any system downtime and data loss (hot deploy).
 See [gigaspaces wiki] for details.
 
-Tool will restart all processing units, which defined by user.
+Tool will restart all processing units defined by user.
 
-New files will be copied to the deploy folder. After that application will define all processing units and restart their.
+New files will be copied to the deploy folder. After that application will define all processing units and restart them.
 
-Restart stateful processing unit.
+Stateful PU restart.
 ---
-1. Tooll define all processing unit instances and identify their space mode.
-2. Restat all backups
-3. If double restart is turn off, primaries would restarted the same time. If double restart option is turn on, primaries would restarted twice and one by one.
+1. Tool define all processing unit instances and identify their space mode.
+2. All backups restarted
+3. All primaries restarted. If 'double_restart' option enabled, primaries restarted twice to return to the original state.
 
 Build
 ---
@@ -30,7 +30,7 @@ Run
 2. Unzip `XAP-hot-redeploy-0.0.1-SNAPSHOT.zip` file.
 3. Configure password-less ssh connection between client machine and GSM hosts (see [SSH login without password] page for instruction).
 4. Copy jar file with new classes to the folder with .sh file.
-5. Configure environment properties in `properties.sh` file.
+5. Configure options in `properties.sh` file.
 6. Run `XAP-hot-redeploy.sh` script.
 
 Results
@@ -76,15 +76,15 @@ All details about hot-redeploy process you can see in `hot-redeploy.log` file.
 Redeploy command options
 ---
 
-| Option                     | Description                                                                                                                                                                        | Value format                              |
-|----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------|
-| -pu,  -pu_name             | Name of the processing unit that should be redeploy. Can be declare several times.                                                                                                 | -pu [pu name] -pu [pu name] -pu [pu name] |
-| -put,  -pu_timeout         | Timeout for identify processing unit (in seconds).                                                                                                                                 | -put [timeout]                            |
-| -smt,  -space_mode_timeout | Timeout for identify space mode (in seconds).                                                                                                                                      | -smt [timeout]                            |
-| -gsl,  -gs_locator         | Gigaspace locator to cluster                                                                                                                                                       | -gsl [locator]                            |
-| -gsg, -gs_group            | Lookup group                                                                                                                                                                       | -gsg [lookup group]                       |
-| -s,  -secured              | Set this parameter "true" if space is secured. Will set in "false" by default.                                                                                                     | -s [true]                                 |
-| -dr,  -double_restart      | Set "true" if all instances should placed in "original" vm after redeploy. When this parameter is "true" primary instances would restarted twice. Will set  in "false" by default. | -dr [true]                                |
+| Option                    | Optional/required | Default value                  | Description                                                                                                                                                      | Value format                |
+|---------------------------|-------------------|--------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------|
+| -pu, -pu_name             | required          | -                              | Name of the processing unit that should be redeployed.  It's possible to declare several instances.                                                              | -pu [pu name] -pu [pu name] |
+| -put, -pu_timeout         | required          | -                              | Timeout to identify processing unit (in seconds).                                                                                                                | -put [timeout]              |
+| -smt, -space_mode_timeout | required          | -                              | Timeout to identify space mode (in seconds).                                                                                                                     | -smt [timeout]              |
+| -gsl, -gs_locator         | optional          | localhost                      | Gigaspace locator                                                                                                                                                | -gsl [locator]              |
+| -gsg, -gs_group           | optional          | Gigaspace default lookup group | Lookup group                                                                                                                                                     | -gsg [lookup group]         |
+| -s, -secured              | optional          | "false"                        | Set this parameter "true" if space is secured.  "False" by default                                                                                               | -s true                     |
+| -dr, -double_restart      | optional          | "false"                        | Set "true" if all instances should be placed in "original" vm after redeploy.  When set to "true" primary instances restarted twice.  By default set to "false". | -dr true                    |
 
 Tests
 ---
@@ -96,7 +96,7 @@ mvn clean install -DskipTests=false
 
  * run gs-agent.sh/bat
  * lookup group and locator should be set to default values
- * properties should be set in config.properties file
+ * properties should be set in `/tool/src/test/resources/config.properties` file
  * make sure that there is no pu with name "space" deployed already
 
 [gigaspaces wiki]:http://wiki.gigaspaces.com/wiki/display/XAP96/Deploying+onto+the+Service+Grid#DeployingontotheServiceGrid-HotDeploy
