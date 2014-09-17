@@ -10,7 +10,7 @@ Tool will restart all processing units, which defined by user.
 
 New files will be copied to the deploy folder. After that application will define all processing units and restart their.
 
-Reestar stateful processing unit.
+Restart stateful processing unit.
 ---
 1. Tooll define all processing unit instances and identify their space mode.
 2. Restat all backups
@@ -92,7 +92,7 @@ If you want to build tool with running tests use
 ```
 mvn clean install -DskipTests=false
 ```
-** PREREQUISITES for running tests:**
+>PREREQUISITES for running tests:
 
  * run gs-agent.sh/bat
  * lookup group and locator should be set to default values
