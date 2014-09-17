@@ -23,7 +23,7 @@ For build use:
     mvn clean install 
     
 It will create `XAP-hot-redeploy-0.0.1-SNAPSHOT.zip` file.
-Note, that tests will be skipped in this case. How to build with tests see in [Tests][Tests] section.
+Note, that tests will be skipped in this case. How to build with tests see in [Tests] section.
 
 
 Run
@@ -91,7 +91,8 @@ If there are any problems during the hot-redeploy, you will see an error message
 
 All details about hot-redeploy process you can see in `hot-redeploy.log` file.       |
 
-[Tests]: Tests
+Tests
+---
 
 If you want to build tool with running tests use 
 ```
@@ -106,3 +107,4 @@ mvn clean install -DskipTests=false
 
 [gigaspaces wiki]:http://wiki.gigaspaces.com/wiki/display/XAP96/Deploying+onto+the+Service+Grid#DeployingontotheServiceGrid-HotDeploy
 [SSH login without password]:http://www.linuxproblem.org/art_9.html
+[Tests]:https://github.com/fe2s/xap-hot-deploy/blob/master/README.md#Tests
