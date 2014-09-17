@@ -89,7 +89,7 @@ If there are any problems during the hot-redeploy, you will see an error message
 20:11:27,864  INFO main HotRedeployMain:checkFiles:77 - Hot redeploy failed
 ```
 
-All details about hot-redeploy process you can see in `hot-redeploy.log` file.       |
+All details about hot-redeploy process you can see in `hot-redeploy.log` file.
 
 Tests
 ---
