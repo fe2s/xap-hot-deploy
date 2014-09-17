@@ -2,7 +2,7 @@
 GSM_HOSTS=
 
 # map with key value pairs, where key is processing unit name, value is name of file with new classes, e.g. declare -A PU=( [space]=space.jar )
-declare -A PU=( [space]=space.jar, [web]=web.war )
+declare -A PU=( [space]=space.jar [web]=web.war )
 
 # name of user on remote machine, e.g. "user"
 SSS_USER="user"
