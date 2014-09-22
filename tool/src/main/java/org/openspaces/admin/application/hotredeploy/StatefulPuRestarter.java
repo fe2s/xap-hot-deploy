@@ -115,7 +115,7 @@ public class StatefulPuRestarter extends PuRestarter {
         for (ProcessingUnitInstance puInstance : puInstances) {
 
             if (puInstance.getSpaceInstance().getMode() == SpaceMode.BACKUP) {
-                backupService.submit(new PuInstanceRestarter(puInstance));
+                backupService.submit(new PuInstanceRestarter(puInstance, config.getRestartTimeout()));
             }
         }
         shutDownAndWait(backupService);
@@ -130,7 +130,7 @@ public class StatefulPuRestarter extends PuRestarter {
     private void restartPrimaries(ProcessingUnitInstance[] puInstances, ExecutorService primaryService) {
         for (ProcessingUnitInstance puInstance : puInstances) {
             if (puInstance.getSpaceInstance().getMode() == SpaceMode.PRIMARY) {
-                primaryService.submit(new PuInstanceRestarter(puInstance));
+                primaryService.submit(new PuInstanceRestarter(puInstance, config.getRestartTimeout()));
             }
         }
         shutDownAndWait(primaryService);

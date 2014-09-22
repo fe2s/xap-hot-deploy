@@ -31,6 +31,9 @@ public class Config {
     @Parameter(names = { "-smt", "-space_made_timeout" }, description = "Timeout for identify space mode")
     private Long identifySpaceModeTimeout;
 
+    @Parameter(names = {"-rt", "-restart_timeout"}, description = "Timeout for restarting pu")
+    private long restartTimeout;
+
     @Parameter(names = { "-s", "-secured" }, description = "Identify security", arity = 1)
     private boolean isSecured = false;
 
@@ -64,4 +67,9 @@ public class Config {
     public boolean isDoubleRestart() {
         return doubleRestart;
     }
+
+    public long getRestartTimeout() {
+        return restartTimeout;
+    }
+
 }
