@@ -3,6 +3,8 @@ package org.openspaces.admin.application.hotredeploy;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import java.io.File;
+
 public class HotRedeployMain {
 
     public static final String FAILURE = "Hot redeploy failed";
@@ -14,6 +16,11 @@ public class HotRedeployMain {
         Config config = ConfigInitializer.init(args);
         PuManager puManager = new PuManager(config);
         puManager.restartAllPUs();
+
+        String tempDir = System.getProperty("java.io.tmpdir");
+        File tempDirPu = new File(tempDir + File.separator + "pu");
+        FileUtils.deleteDirectory(tempDirPu);
+
         log.info(SUCCESS);
     }
 }
