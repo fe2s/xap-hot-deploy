@@ -41,7 +41,14 @@ public class StatefulPuRestarter extends PuRestarter {
         int backupsThreads = checkBackups(puInstances);
         int primariesThreads = puInstances.length - backupsThreads;
 
-        ExecutorService backupService = Executors.newFixedThreadPool(backupsThreads);
+        ExecutorService backupService;
+
+        if (backupsThreads == 0){
+            backupService = Executors.newFixedThreadPool(1);
+        } else {
+            backupService = Executors.newFixedThreadPool(backupsThreads);
+        }
+
         // if return to original state needed, primaries should restart one by one.
         if (config.isDoubleRestart()) {
             primariesThreads = 1;
