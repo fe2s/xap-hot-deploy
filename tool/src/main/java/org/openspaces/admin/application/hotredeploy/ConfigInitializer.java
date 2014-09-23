@@ -27,6 +27,7 @@ public class ConfigInitializer {
         log.info("Lookup group: " + config.getLookupGroup());
         log.info("Timeout for identify pu: " + config.getIdentifyPuTimeout());
         log.info("Timeout for identify space mode: " + config.getIdentifySpaceModeTimeout());
+        log.info("Timeout for restart " + config.getRestartTimeout());
         log.info("Secured: " + config.isSecured());
         log.info("Double restart: " + config.isDoubleRestart());
         return config;

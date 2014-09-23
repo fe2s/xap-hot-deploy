@@ -110,7 +110,7 @@ public class IntegrationTest {
         String[] pathToDeployFolder = {"deploy", "space"};
         File oldFiles = new File(gsLocation + File.separator + StringUtils.join(pathToDeployFolder, File.separator));
         String deployPath = oldFiles.getPath();
-        deleteDirectory(oldFiles);
+        FileUtils.deleteDirectory(oldFiles);
         return deployPath;
     }
 
@@ -119,19 +119,7 @@ public class IntegrationTest {
         space.undeploy();
     }
 
-    /**
-     * Deletes directory with subdirs and subfolders
-     */
-    public static void deleteDirectory(File dir) {
-        if (dir.isDirectory()) {
-            String[] children = dir.list();
-            for (String aChildren : children) {
-                File f = new File(dir, aChildren);
-                deleteDirectory(f);
-            }
-            dir.delete();
-        } else dir.delete();
-    }
+
 
     public static String getGsLocation() {
         Properties prop = new Properties();
