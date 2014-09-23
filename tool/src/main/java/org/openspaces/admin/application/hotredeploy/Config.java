@@ -13,6 +13,10 @@ import java.util.List;
 public class Config {
     public static Logger log = LogManager.getLogger(Config.class);
 
+
+    @Parameter(names = {"-gsloc", "-gs_location"}, description = "Path to gigaspaces folder")
+    private String gigaspacesLocation;
+
     @Parameter
     private List<String> parameters = new ArrayList<String>();
 
@@ -70,6 +74,10 @@ public class Config {
 
     public long getRestartTimeout() {
         return restartTimeout;
+    }
+
+    public String getGigaspacesLocation() {
+        return gigaspacesLocation;
     }
 
 }

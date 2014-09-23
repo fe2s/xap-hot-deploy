@@ -22,6 +22,7 @@ public class ConfigInitializer {
         Config config = new Config();
         new JCommander(config, args);
 
+        log.info("Gigaspaces location: " + config.getGigaspacesLocation());
         log.info("Pu to restart: " + config.getPuToRestart());
         log.info("Locator: " + config.getLocator());
         log.info("Lookup group: " + config.getLookupGroup());

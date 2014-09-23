@@ -27,7 +27,7 @@ do
     ssh $SSS_USER@$host unzip $GIGASPACES_LOCATION/deploy/${PU[$K]} -d $GIGASPACES_LOCATION/deploy/$K
   done
 done
-args="-put $IDENT_PU_TIMEOUT -smt $IDENT_SPACE_MODE_TIMEOUT -dr $DOUBLE_RESTART -rt $RESTART_TIMEOUT"
+args="-put $IDENT_PU_TIMEOUT -smt $IDENT_SPACE_MODE_TIMEOUT -dr $DOUBLE_RESTART -rt $RESTART_TIMEOUT" -gsloc $GIGASPACES_LOCATION
 
 for K in "${!PU[@]}"; do args="$args -pun $K"; done
 
