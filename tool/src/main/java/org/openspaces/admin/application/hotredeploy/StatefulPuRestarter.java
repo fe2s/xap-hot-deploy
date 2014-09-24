@@ -14,17 +14,19 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Anna_Babich
  */
-public class StatefulPuRestarter extends PuRestarter {
+public class StatefulPuRestarter implements PuRestarter {
 
     public static Logger log = LogManager.getLogger(StatefulPuRestarter.class);
     private Config config;
+    private RollbackChecker rollbackChecker;
 
     /**
      * Constructor.
      * @param config command line args.
      */
-    public StatefulPuRestarter(Config config){
+    public StatefulPuRestarter(Config config, RollbackChecker rollbackChecker){
         this.config = config;
+        this.rollbackChecker = rollbackChecker;
     }
 
     /**
@@ -32,7 +34,7 @@ public class StatefulPuRestarter extends PuRestarter {
      * @param processingUnit current pu (stateful)
      */
     public void restart(ProcessingUnit processingUnit){
-        ProcessingUnitInstance[] puInstances = getPuInstances(processingUnit);
+        ProcessingUnitInstance[] puInstances = PuUtils.getStatefulPuInstances(processingUnit, config);
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -95,11 +97,19 @@ public class StatefulPuRestarter extends PuRestarter {
      */
     private void restartAllInstances(ProcessingUnit processingUnit, ExecutorService backupService, ExecutorService primaryService) {
         log.info("Restarting pu " + processingUnit.getName() + " with type " + processingUnit.getType());
-        ProcessingUnitInstance [] puInstances = getPuInstances(processingUnit);
+        ProcessingUnitInstance [] puInstances = PuUtils.getStatefulPuInstances(processingUnit, config);
         restartBackups(puInstances, backupService);
+        try{
+            rollbackChecker.checkForErrors();
+        } catch (HotRedeployException e) {
+           if(rollbackChecker.isRollbackNeed("Backup restarting fails. If you don't rollback all data will be lost")){
+               rollbackChecker.doRollback();
+           }
+        }
+
         restartPrimaries(puInstances, primaryService);
         if (config.isDoubleRestart()) {
-            puInstances = getPuInstances(processingUnit);
+            puInstances = PuUtils.getStatefulPuInstances(processingUnit, config);
             primaryService = Executors.newFixedThreadPool(1);
             restartPrimaries(puInstances, primaryService);
         }
@@ -148,41 +158,6 @@ public class StatefulPuRestarter extends PuRestarter {
             }
         } catch (InterruptedException e) {
             log.error(e);
-        }
-    }
-
-    /**
-     * Identify pu instances and wait for identify space mode of each instances.
-     * @return discovered pu instances
-     */
-    public ProcessingUnitInstance[] getPuInstances(ProcessingUnit processingUnit){
-        ProcessingUnitInstance[] puInstances = identifyPuInstances(processingUnit);
-        identSpaceMode(puInstances);
-        return puInstances;
-    }
-
-    /**
-     * Discover space mode for all pu instances.
-     *
-     * @param puInstances discovered processing unit instances.
-     */
-    private void identSpaceMode(ProcessingUnitInstance[] puInstances) {
-        Long timeout = System.currentTimeMillis() + config.getIdentifySpaceModeTimeout() * 1000;
-        boolean keepTrying = true;
-
-        while (keepTrying) {
-            if (System.currentTimeMillis() >= timeout) {
-                String cause = "can't identify space mode";
-                log.error(cause);
-                log.error(HotRedeployMain.FAILURE);
-                throw new HotRedeployException(cause);
-            }
-            keepTrying = false;
-            for (ProcessingUnitInstance instance : puInstances) {
-                if ((instance.getSpaceInstance() == null) || (instance.getSpaceInstance().getMode() == SpaceMode.NONE)) {
-                    keepTrying = true;
-                }
-            }
         }
     }
 }

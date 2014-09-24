@@ -32,6 +32,9 @@ public class Config {
     @Parameter(names = { "-put", "-pu_timeout" }, description = "Timeout for identify pu")
     private Long identifyPuTimeout;
 
+    @Parameter(names = { "-inst", "-instances_timeout" }, description = "Timeout for identify instances")
+    private Long identifyInstancesTimeout;
+
     @Parameter(names = { "-smt", "-space_made_timeout" }, description = "Timeout for identify space mode")
     private Long identifySpaceModeTimeout;
 

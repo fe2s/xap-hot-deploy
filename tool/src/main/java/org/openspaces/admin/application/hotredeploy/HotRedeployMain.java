@@ -4,6 +4,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.io.File;
+import java.util.Scanner;
 
 public class HotRedeployMain {
 
@@ -15,12 +16,23 @@ public class HotRedeployMain {
         ConfigInitializer.checkFiles();
         Config config = ConfigInitializer.init(args);
         PuManager puManager = new PuManager(config);
-        puManager.restartAllPUs();
+        puManager.createAdmin();
+        RollbackChecker rollbackChecker = new RollbackChecker(config, puManager);
+        PuUtils.restartAllPUs(puManager, config, rollbackChecker);
 
-        String tempDir = System.getProperty("java.io.tmpdir");
-        File tempDirPu = new File(tempDir + File.separator + "pu");
-        FileUtils.deleteDirectory(tempDirPu);
 
+        try{
+            rollbackChecker.checkForErrors();
+        } catch (HotRedeployException e) {
+            if(rollbackChecker.isRollbackNeed("Hot redeploy fails. If you don't rollback all data will be lost")){
+                rollbackChecker.doRollback();
+            }
+        }
+
+        FileUtils.cleanTempDirectory();
+        puManager.closeAdmin();
         log.info(SUCCESS);
     }
+
+
 }

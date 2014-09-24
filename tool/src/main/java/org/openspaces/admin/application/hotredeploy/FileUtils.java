@@ -20,4 +20,10 @@ public class FileUtils {
             dir.delete();
         } else dir.delete();
     }
+
+    public static void cleanTempDirectory(){
+        String tempDir = System.getProperty("java.io.tmpdir");
+        File tempDirPu = new File(tempDir + File.separator + "pu");
+        deleteDirectory(tempDirPu);
+    }
 }

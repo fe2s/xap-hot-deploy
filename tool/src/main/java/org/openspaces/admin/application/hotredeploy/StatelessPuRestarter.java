@@ -8,12 +8,12 @@ import org.openspaces.admin.pu.ProcessingUnitInstance;
 /**
  * @author Anna_Babich
  */
-public class StatelessPuRestarter extends PuRestarter {
+public class StatelessPuRestarter implements PuRestarter {
 
     public static Logger log = LogManager.getLogger(StatelessPuRestarter.class);
 
     public void restart(ProcessingUnit processingUnit){
-        ProcessingUnitInstance[] puInstances = identifyPuInstances(processingUnit);
+        ProcessingUnitInstance[] puInstances = PuUtils.getPuInstances(processingUnit);
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {

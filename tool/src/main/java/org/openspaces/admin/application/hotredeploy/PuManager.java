@@ -5,9 +5,12 @@ import org.apache.log4j.Logger;
 import org.openspaces.admin.Admin;
 import org.openspaces.admin.AdminFactory;
 import org.openspaces.admin.pu.ProcessingUnit;
+import org.openspaces.admin.pu.ProcessingUnitInstance;
 import org.openspaces.admin.pu.ProcessingUnitType;
 
 import java.io.Console;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -19,15 +22,16 @@ public class PuManager {
     private Config config;
     private Admin admin;
 
-    public PuManager(Config config){
+    public PuManager(Config config) {
         this.config = config;
     }
 
     /**
      * Create admin. Required before identify processing unit instances.
+     *
      * @return
      */
-    public Admin createAdmin(){
+    public Admin createAdmin() {
         AdminFactory adminFactory = new AdminFactory();
         if (config.getLocator() != null) {
             adminFactory.addLocator(config.getLocator());
@@ -54,21 +58,24 @@ public class PuManager {
         }
     }
 
-    /**
-     * Restart all discovered pus.
-     */
-    public void restartAllPUs() {
-        createAdmin();
-        PuRestarter puRestarter = null;
-        for(String name: config.getPuToRestart()) {
+
+
+    public List<ProcessingUnit> identProcessingUnits() {
+        List<ProcessingUnit> processingUnits = new ArrayList<ProcessingUnit>();
+        for (String name : config.getPuToRestart()) {
             ProcessingUnit processingUnit = admin.getProcessingUnits().waitFor(name, config.getIdentifyPuTimeout(), TimeUnit.SECONDS);
-            if (processingUnit.getType() == ProcessingUnitType.STATEFUL){
-                puRestarter = new StatefulPuRestarter(config);
-            } else {
-                puRestarter = new StatelessPuRestarter();
+            if (processingUnit == null) {
+                String cause = "can't get PU instances for " + name;
+                log.error(cause);
+                log.error(HotRedeployMain.FAILURE);
+                throw new HotRedeployException(cause);
             }
-            puRestarter.restart(processingUnit);
+            processingUnits.add(processingUnit);
         }
+        return processingUnits;
+    }
+
+    public void closeAdmin(){
         admin.close();
     }
 }
