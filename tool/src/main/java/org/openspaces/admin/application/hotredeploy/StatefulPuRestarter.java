@@ -3,6 +3,9 @@ package org.openspaces.admin.application.hotredeploy;
 import com.gigaspaces.cluster.activeelection.SpaceMode;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.openspaces.admin.application.hotredeploy.config.Config;
+import org.openspaces.admin.application.hotredeploy.exceptions.HotRedeployException;
+import org.openspaces.admin.application.hotredeploy.utils.PuUtils;
 import org.openspaces.admin.pu.ProcessingUnit;
 import org.openspaces.admin.pu.ProcessingUnitInstance;
 
@@ -103,7 +106,7 @@ public class StatefulPuRestarter implements PuRestarter {
             rollbackChecker.checkForErrors();
         } catch (HotRedeployException e) {
            if(rollbackChecker.isRollbackNeed("Backup restarting fails. If you don't rollback all data will be lost")){
-               rollbackChecker.doRollback();
+               rollbackChecker.doRollback(config);
            }
         }
 

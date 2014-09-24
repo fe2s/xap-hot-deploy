@@ -1,14 +1,16 @@
-package org.openspaces.admin.application.hotredeploy;
+package org.openspaces.admin.application.hotredeploy.utils;
 
 import com.gigaspaces.cluster.activeelection.SpaceMode;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.openspaces.admin.application.hotredeploy.*;
+import org.openspaces.admin.application.hotredeploy.config.Config;
+import org.openspaces.admin.application.hotredeploy.exceptions.HotRedeployException;
 import org.openspaces.admin.pu.ProcessingUnit;
 import org.openspaces.admin.pu.ProcessingUnitInstance;
 import org.openspaces.admin.pu.ProcessingUnitType;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Anna_Babich
@@ -59,16 +61,15 @@ public class PuUtils {
     public static ProcessingUnitInstance[] getPuInstances(ProcessingUnit processingUnit) {
         int i = processingUnit.getPlannedNumberOfInstances();
         // Wait for all the members to be discovered
-        processingUnit.waitFor(processingUnit.getPlannedNumberOfInstances());
-        ProcessingUnitInstance[] instances = processingUnit.getInstances();
-        return instances;
+        processingUnit.waitFor(i);
+        return processingUnit.getInstances();
     }
 
     /**
      * Restart all discovered pus.
      */
     public static void restartAllPUs(PuManager puManager, Config config, RollbackChecker rollbackChecker) {
-        PuRestarter puRestarter = null;
+        PuRestarter puRestarter;
         List<ProcessingUnit> processingUnits = puManager.identProcessingUnits();
         for (ProcessingUnit processingUnit : processingUnits) {
             if (processingUnit.getType() == ProcessingUnitType.STATEFUL) {

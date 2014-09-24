@@ -1,8 +1,10 @@
-package org.openspaces.admin.application.hotredeploy;
+package org.openspaces.admin.application.hotredeploy.config;
 
 import com.beust.jcommander.JCommander;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.openspaces.admin.application.hotredeploy.exceptions.HotRedeployException;
+import org.openspaces.admin.application.hotredeploy.HotRedeployMain;
 
 import java.util.Scanner;
 

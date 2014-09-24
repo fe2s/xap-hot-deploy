@@ -11,6 +11,8 @@ import org.junit.Test;
 import org.openspaces.admin.Admin;
 import org.openspaces.admin.AdminException;
 import org.openspaces.admin.AdminFactory;
+import org.openspaces.admin.application.hotredeploy.exceptions.HotRedeployException;
+import org.openspaces.admin.application.hotredeploy.utils.FileUtils;
 import org.openspaces.admin.gsm.GridServiceManagers;
 import org.openspaces.admin.pu.ProcessingUnit;
 import org.openspaces.admin.pu.ProcessingUnitDeployment;

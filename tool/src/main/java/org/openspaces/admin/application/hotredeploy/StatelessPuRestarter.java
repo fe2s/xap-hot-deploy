@@ -2,6 +2,7 @@ package org.openspaces.admin.application.hotredeploy;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.openspaces.admin.application.hotredeploy.utils.PuUtils;
 import org.openspaces.admin.pu.ProcessingUnit;
 import org.openspaces.admin.pu.ProcessingUnitInstance;
 

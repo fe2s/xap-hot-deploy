@@ -1,6 +1,8 @@
 package org.openspaces.admin.application.hotredeploy;
 
 import org.junit.Test;
+import org.openspaces.admin.application.hotredeploy.config.Config;
+import org.openspaces.admin.application.hotredeploy.config.ConfigInitializer;
 
 import static org.junit.Assert.*;
 
