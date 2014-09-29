@@ -20,11 +20,11 @@ fi
 
 for host in "${GSM_HOSTS[@]}"
 do
-  ssh $SSS_USER:$host mkdir /tmp/pu/
+  ssh $SSS_USER@$host mkdir /tmp/pu/
   for K in "${!PU[@]}";
   do
     echo "Copy $K to temp directory"
-    ssh $SSS_USER:$host mv $GIGASPACES_LOCATION/deploy/$K /tmp/pu
+    ssh $SSS_USER@$host mv $GIGASPACES_LOCATION/deploy/$K /tmp/pu
     echo ${PU[$K]}
     scp ${PU[$K]} $SSS_USER@$host:$GIGASPACES_LOCATION/deploy
     ssh $SSS_USER@$host unzip $GIGASPACES_LOCATION/deploy/${PU[$K]} -d $GIGASPACES_LOCATION/deploy/$K
