@@ -25,18 +25,20 @@ public class StatefulPuRestarter implements PuRestarter {
 
     /**
      * Constructor.
+     *
      * @param config command line args.
      */
-    public StatefulPuRestarter(Config config, RollbackChecker rollbackChecker){
+    public StatefulPuRestarter(Config config, RollbackChecker rollbackChecker) {
         this.config = config;
         this.rollbackChecker = rollbackChecker;
     }
 
     /**
      * Restart processing unit
+     *
      * @param processingUnit current pu (stateful)
      */
-    public void restart(ProcessingUnit processingUnit){
+    public void restart(ProcessingUnit processingUnit) {
         ProcessingUnitInstance[] puInstances = PuUtils.getStatefulPuInstances(processingUnit, config);
         try {
             Thread.sleep(1000);
@@ -48,7 +50,7 @@ public class StatefulPuRestarter implements PuRestarter {
 
         ExecutorService backupService;
 
-        if (backupsThreads == 0){
+        if (backupsThreads == 0) {
             backupService = Executors.newFixedThreadPool(1);
         } else {
             backupService = Executors.newFixedThreadPool(backupsThreads);
@@ -100,21 +102,18 @@ public class StatefulPuRestarter implements PuRestarter {
      */
     private void restartAllInstances(ProcessingUnit processingUnit, ExecutorService backupService, ExecutorService primaryService) {
         log.info("Restarting pu " + processingUnit.getName() + " with type " + processingUnit.getType());
-        ProcessingUnitInstance [] puInstances = PuUtils.getStatefulPuInstances(processingUnit, config);
+        ProcessingUnitInstance[] puInstances = PuUtils.getStatefulPuInstances(processingUnit, config);
         restartBackups(puInstances, backupService);
-        try{
-            rollbackChecker.checkForErrors();
-        } catch (HotRedeployException e) {
-           if(rollbackChecker.isRollbackNeed("Backup restarting fails. If you don't rollback all data will be lost")){
-               rollbackChecker.doRollback(config);
-           }
-        }
-
-        restartPrimaries(puInstances, primaryService);
-        if (config.isDoubleRestart()) {
-            puInstances = PuUtils.getStatefulPuInstances(processingUnit, config);
-            primaryService = Executors.newFixedThreadPool(1);
+        boolean rollback = rollbackChecker.tryRollback("Backup restarting fails. If you don't rollback all data will be lost");
+        if (!rollback) {
             restartPrimaries(puInstances, primaryService);
+            rollback = rollbackChecker.tryRollback("Primary restarting fails. If you don't rollback all data will be lost");
+            if ((!rollback) && (config.isDoubleRestart())){
+                    puInstances = PuUtils.getStatefulPuInstances(processingUnit, config);
+                    primaryService = Executors.newFixedThreadPool(1);
+                    restartPrimaries(puInstances, primaryService);
+                    rollbackChecker.tryRollback("Primary restarting fails. If you don't rollback all data will be lost");
+            }
         }
     }
 
@@ -158,6 +157,7 @@ public class StatefulPuRestarter implements PuRestarter {
         service.shutdown();
         try {
             while (!service.awaitTermination(10, TimeUnit.MINUTES)) {
+                Thread.sleep(100);
             }
         } catch (InterruptedException e) {
             log.error(e);

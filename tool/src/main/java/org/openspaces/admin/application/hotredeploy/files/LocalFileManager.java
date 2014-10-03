@@ -25,15 +25,15 @@ public class LocalFileManager implements FileManager {
         List<String> puNames = config.getPuToRestart();
         String gigaspacesLocation = config.getGigaspacesLocation();
         for (String puName : puNames) {
-            String folderPath = StringUtils.join(new String[]{gigaspacesLocation,"deploy",puName}, File.pathSeparator);
+            String folderPath = StringUtils.join(new String[]{gigaspacesLocation,"deploy",puName}, File.separator);
             File puFolder = new File(folderPath);
             FileUtils.deleteDirectory(puFolder);
 
             String tempDir = System.getProperty("java.io.tmpdir");
-            String tempFolderPath = StringUtils.join(new String[]{tempDir,"pu",puName}, File.pathSeparator);
+            String tempFolderPath = StringUtils.join(new String[]{tempDir,"pu",puName}, File.separator);
             File tempPuFolder = new File(tempFolderPath);
 
-            String destinationFolderPath = StringUtils.join(new String[]{gigaspacesLocation,"deploy",puName}, File.pathSeparator);
+            String destinationFolderPath = StringUtils.join(new String[]{gigaspacesLocation,"deploy",puName}, File.separator);
             File destinationFolder = new File(destinationFolderPath);
             try {
                 FileUtils.copyFolder(tempPuFolder, destinationFolder);

@@ -6,6 +6,7 @@ import org.openspaces.admin.application.hotredeploy.config.Config;
 import org.openspaces.admin.application.hotredeploy.exceptions.HotRedeployException;
 import org.openspaces.admin.application.hotredeploy.files.FileManager;
 import org.openspaces.admin.application.hotredeploy.utils.PuUtils;
+import org.openspaces.admin.gsm.GridServiceManager;
 import org.openspaces.admin.pu.ProcessingUnit;
 import org.openspaces.admin.pu.ProcessingUnitInstance;
 import org.openspaces.admin.pu.ProcessingUnitType;
@@ -59,6 +60,47 @@ public class RollbackChecker {
     public void doRollback(Config config) {
         sshFileManager.restoreTempFolders();
         log.info("do rollback");
-        PuUtils.restartAllPUs(puManager, config, this);
+        GridServiceManager[] managers = puManager.getMangers();
+        int numberOfManagers = managers.length;
+        if (numberOfManagers > 1) {
+            for (GridServiceManager gsm:managers){
+                gsm.restart();
+                try {
+                while (puManager.getMangers().length < numberOfManagers) {
+                    Thread.sleep(100);
+                }
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else {
+            throw new HotRedeployException("There is 1 GSM in system");
+        }
+        List<ProcessingUnit> processingUnits = puManager.identProcessingUnits();
+        for (ProcessingUnit processingUnit : processingUnits) {
+
+            log.info("start wait");
+            processingUnit.waitFor(processingUnit.getPlannedNumberOfInstances(), config.getRestartTimeout(), TimeUnit.SECONDS);
+        }
+        log.info("done");
+        //PuUtils.restartAllPUs(puManager, config, this);
+    }
+
+    // TODO rename it
+    public boolean tryRollback(String message){
+        //TODO rename
+        boolean rollback = false;
+        try{
+            checkForErrors();
+        } catch (HotRedeployException e) {
+            rollback = true;
+            if(isRollbackNeed(message)){
+                doRollback(config);
+            } else {
+                throw new HotRedeployException("No rollback");
+            }
+        }
+        return rollback;
     }
 }

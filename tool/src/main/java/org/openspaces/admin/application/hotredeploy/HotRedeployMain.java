@@ -38,13 +38,6 @@ public class HotRedeployMain {
         RollbackChecker rollbackChecker = new RollbackChecker(config, puManager, fileManager);
         PuUtils.restartAllPUs(puManager, config, rollbackChecker);
 
-        try{
-            rollbackChecker.checkForErrors();
-        } catch (HotRedeployException e) {
-            if(rollbackChecker.isRollbackNeed("Hot redeploy fails. If you don't rollback all data will be lost")){
-                rollbackChecker.doRollback(config);
-            }
-        }
 
         log.info(SUCCESS);
     }

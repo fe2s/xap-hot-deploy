@@ -46,8 +46,9 @@ public class Config {
 
     @Parameter(names = {"-dr", "-double_restart"}, description = "Is double restart required", arity = 1)
     private boolean doubleRestart = false;
+
     @Parameter(names = {"-gsmh", "-gsm_hosts"}, description = "Hosts on which GSM are located")
-    private List<String> gsmHosts;
+    private List<String> gsmHosts = new ArrayList<String>();
 
     @Parameter(names = {"-u", "-user"}, description = "Name of user on remote machine")
     private String sshUser;

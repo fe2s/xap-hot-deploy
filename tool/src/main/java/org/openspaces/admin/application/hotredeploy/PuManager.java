@@ -6,6 +6,9 @@ import org.openspaces.admin.Admin;
 import org.openspaces.admin.AdminFactory;
 import org.openspaces.admin.application.hotredeploy.config.Config;
 import org.openspaces.admin.application.hotredeploy.exceptions.HotRedeployException;
+import org.openspaces.admin.gsa.GridServiceAgent;
+import org.openspaces.admin.gsm.GridServiceManager;
+import org.openspaces.admin.gsm.GridServiceManagers;
 import org.openspaces.admin.pu.ProcessingUnit;
 
 import java.io.Console;
@@ -58,8 +61,6 @@ public class PuManager {
         }
     }
 
-
-
     public List<ProcessingUnit> identProcessingUnits() {
         List<ProcessingUnit> processingUnits = new ArrayList<ProcessingUnit>();
         for (String name : config.getPuToRestart()) {
@@ -74,6 +75,11 @@ public class PuManager {
         }
         return processingUnits;
     }
+
+    public GridServiceManager[] getMangers(){
+        return admin.getGridServiceManagers().getManagers();
+    }
+
 
     public void closeAdmin(){
         admin.close();

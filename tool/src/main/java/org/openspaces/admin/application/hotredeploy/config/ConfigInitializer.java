@@ -33,6 +33,9 @@ public class ConfigInitializer {
         log.info("Timeout for restart " + config.getRestartTimeout());
         log.info("Secured: " + config.isSecured());
         log.info("Double restart: " + config.isDoubleRestart());
+        log.info("GSM Hosts: " + config.getGsmHosts());
+        log.info("User: " + config.getSshUser());
+        log.info("Is local cluster: " + config.isLocalCluster());
         return config;
     }
 

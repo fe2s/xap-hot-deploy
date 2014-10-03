@@ -11,6 +11,7 @@ import org.openspaces.admin.pu.ProcessingUnitInstance;
 import org.openspaces.admin.pu.ProcessingUnitType;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Anna_Babich
@@ -60,8 +61,9 @@ public class PuUtils {
      */
     public static ProcessingUnitInstance[] getPuInstances(ProcessingUnit processingUnit) {
         int i = processingUnit.getPlannedNumberOfInstances();
-        // Wait for all the members to be discovered
-        processingUnit.waitFor(i);
+        // Wait for all the members to be discovered\
+        // TODO 15 to config
+        processingUnit.waitFor(i, 15, TimeUnit.SECONDS);
         return processingUnit.getInstances();
     }
 

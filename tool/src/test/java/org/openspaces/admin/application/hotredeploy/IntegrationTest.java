@@ -44,6 +44,7 @@ public class IntegrationTest {
 
     private String rootPath;
     private ProcessingUnit space;
+    private String gsLocation;
 
     public static Logger log = LogManager.getLogger(IntegrationTest.class);
 
@@ -79,7 +80,7 @@ public class IntegrationTest {
         Thread.sleep(1000);
 
         // run redeploy
-        String args[] = {"-pun", "space", "-put", "1000", "-smt", "1000", "-s", "false", "-dr", "true"};
+        String args[] = {"-pun", "space", "-put", "1000", "-smt", "1000", "-s", "false", "-dr", "true", "-lcm", "true", gsLocation};
         ByteArrayInputStream in = new ByteArrayInputStream("y".getBytes());
         System.setIn(in);
         HotRedeployMain.main(args);
@@ -105,7 +106,7 @@ public class IntegrationTest {
     }
 
     private String getAndClearDeployDirectory() {
-        String gsLocation = getGsLocation();
+        gsLocation = getGsLocation();
         if (gsLocation == null) {
             throw new HotRedeployException("You should specified path to gigaspace folder in config.properties file");
         }
