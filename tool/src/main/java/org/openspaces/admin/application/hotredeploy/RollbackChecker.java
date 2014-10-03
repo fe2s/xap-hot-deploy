@@ -19,6 +19,8 @@ import java.util.concurrent.TimeUnit;
  * @author Anna_Babich
  */
 public class RollbackChecker {
+    public static final int PAUSE = 100;
+    public static final int WAIT_FOR_GSM_INIT = 5000;
     public static Logger log = LogManager.getLogger(RollbackChecker.class);
 
     private Config config;
@@ -67,9 +69,9 @@ public class RollbackChecker {
                 gsm.restart();
                 try {
                 while (puManager.getMangers().length < numberOfManagers) {
-                    Thread.sleep(100);
+                    Thread.sleep(PAUSE);
                 }
-                    Thread.sleep(5000);
+                    Thread.sleep(WAIT_FOR_GSM_INIT);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -79,12 +81,10 @@ public class RollbackChecker {
         }
         List<ProcessingUnit> processingUnits = puManager.identProcessingUnits();
         for (ProcessingUnit processingUnit : processingUnits) {
-
-            log.info("start wait");
             processingUnit.waitFor(processingUnit.getPlannedNumberOfInstances(), config.getRestartTimeout(), TimeUnit.SECONDS);
         }
         log.info("done");
-        //PuUtils.restartAllPUs(puManager, config, this);
+
     }
 
     // TODO rename it
