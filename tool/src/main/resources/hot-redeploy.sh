@@ -1,5 +1,4 @@
 #!/bin/bash
-
 source ./properties.sh
 
 if [ "x$GSM_HOSTS" = "x" ]; then
@@ -21,10 +20,10 @@ for host in "${GSM_HOSTS[@]}"
 do
   for K in "${!PU[@]}";
   do
-    echo ${PU[$K]}
-    scp ${PU[$K]} $SSS_USER@$host:$GIGASPACES_LOCATION/deploy
-    ssh $SSS_USER@$host rm -rf $K
-    ssh $SSS_USER@$host unzip $GIGASPACES_LOCATION/deploy/${PU[$K]} -d $GIGASPACES_LOCATION/deploy/$K
+    echo "$K = ${PU[$K]}"
+    cp ${PU[$K]} $GIGASPACES_LOCATION/deploy
+    rm -rf $K
+    unzip $GIGASPACES_LOCATION/deploy/${PU[$K]} -d $GIGASPACES_LOCATION/deploy/$K
   done
 done
 args="-put $IDENT_PU_TIMEOUT -smt $IDENT_SPACE_MODE_TIMEOUT -dr $DOUBLE_RESTART"

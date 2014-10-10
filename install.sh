@@ -5,7 +5,7 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
-
+CWD=$(pwd)
 
 #------MOVE TO ANOTHER PLACE--------
 
@@ -15,12 +15,18 @@ fi
 read -p "Please enter shosts on which GSM are located, e.g. ("10.6.133.203" "10.6.133.210"): " GSM_HOSTS
 echo $GSM_HOSTS
 
+mkdir -p  tmp
+
 # map with key value pairs, where key is processing unit name, value is name of file with new classes, e.g. declare -A PU=( [space]=space.jar )
 PUS="("
 while :
 do
   read -p "Please enter PU name: " PU_NAME
   read -p "Please enter path to PU(jar, war) you want to redeploy: " PU_FILE
+  echo $PU_FILE
+  cp $PU_FILE tmp
+  PU_FILE="${PU_FILE##*/}"
+  echo $PU_FILE
   PUS=$PUS"[$PU_NAME]=$PU_FILE"
   read -p "Do you want to redeploy more units (y/n) : " RESP
   if [ "$RESP" = "n" ]; then
@@ -32,6 +38,8 @@ do
     echo "OK"
   fi
 done
+
+echo $PUS
 
 # path to gigaspace directory, e.g. "/home/user/gigaspaces-xap-premium-9.7.1-ga"
 read -p "Please enter path to gigaspace directory, e.g. /home/user/gigaspaces-xap-premium-9.7.1-ga : " GIGASPACES_LOCATION
@@ -61,8 +69,9 @@ cd $installDir
 unzip HotRedeploy.zip
 rm HotRedeploy.zip
 cd HotRedeploy
+mv $CWD/tmp/* $installDir/HotRedeploy
 
-pwd
+rm -r $CWD/tmp
 
 echo "GSM_HOSTS=$GSM_HOSTS" > 'properties.sh'
 echo "declare -A PU=$PUS" >> 'properties.sh'
