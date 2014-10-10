@@ -85,6 +85,7 @@
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
+                   <finalName>HotRedeploy</finalName>
                 </configuration>
                 <executions>
                     <execution>
@@ -112,6 +113,26 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.dstovall</groupId>
+                <artifactId>onejar-maven-plugin</artifactId>
+                <version>1.4.4</version>
+                <executions>
+                    <execution>
+                        <configuration>
+                            <attachToBuild>true</attachToBuild>
+                            <classifier>executable</classifier>
+                            <filename>HotRedeploy.jar</filename>
+                            <mainClass>org.openspaces.admin.application.hotredeploy.HotRedeployMain</mainClass>
+                        </configuration>
+                        <goals>
+                            <goal>one-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 </project>
