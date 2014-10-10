@@ -12,11 +12,13 @@
     <modules>
         <module>test-pu</module>
         <module>tool</module>
+        <module>preparation</module>
     </modules>
     <properties>
         <gigaspacesVersion>10.0.0-11600-RELEASE</gigaspacesVersion>
         <skipTests>true</skipTests>
     </properties>
+
 
     <build>
         <plugins>
