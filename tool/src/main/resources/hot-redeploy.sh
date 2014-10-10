@@ -21,6 +21,7 @@ do
   for K in "${!PU[@]}";
   do
     echo "$K = ${PU[$K]}"
+    rm -rf $GIGASPACES_LOCATION/deploy/$K
     cp ${PU[$K]} $GIGASPACES_LOCATION/deploy
     rm -rf $K
     unzip $GIGASPACES_LOCATION/deploy/${PU[$K]} -d $GIGASPACES_LOCATION/deploy/$K
