@@ -6,7 +6,7 @@
     </formats>
     <files>
         <file>
-            <source>target/XAP-hot-redeploy-${project.version}-jar-with-dependencies.jar</source>
+            <source>target/HotRedeploy-jar-with-dependencies.jar</source>
             <destName>XAP-hot-redeploy.jar</destName>
             <outputDirectory>/</outputDirectory>
         </file>

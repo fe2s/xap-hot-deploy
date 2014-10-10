@@ -15,7 +15,7 @@
         <module>preparation</module>
     </modules>
     <properties>
-        <gigaspacesVersion>10.0.0-11600-RELEASE</gigaspacesVersion>
+        <gigaspacesVersion>9.7.0-10496-RELEASE</gigaspacesVersion>
         <skipTests>true</skipTests>
     </properties>
 
@@ -33,5 +33,18 @@
         </plugins>
     </build>
 
+    <repositories>
+        <repository>
+            <id>org.openspaces</id>
+            <url>http://maven-repository.openspaces.org</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>onejar-maven-plugin.googlecode.com</id>
+            <url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
+        </pluginRepository>
+    </pluginRepositories>
 
     </project>
