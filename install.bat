@@ -49,7 +49,7 @@ ECHO %LOOKUP_GROUPS%
 SET /p INSTALL_DIR="Please enter install dir: " %=%
 ECHO %INSTALL_DIR%
 
-::mvn clean install
+mvn clean install
 
 SET INSTALL_DIR=%INSTALL_DIR%\hot-redeploy
 
