@@ -14,12 +14,17 @@ public class FileManager {
         String rootPath = new File("").getAbsoluteFile().getParentFile().getParent();
         Map<String, String> pus = configuration.getPus();
         String deployPath = configuration.getGsLocation() + File.separator + "deploy" + File.separator;
+
+        System.out.println("DEPLOY_PATH" + deployPath);
+
         for (String puName : pus.keySet()) {
             File file = new File(deployPath + puName);
             FileUtils.deleteDirectory(file);
             try {
                 ZipFile zipFile = new ZipFile(rootPath + File.separator + pus.get(puName));
+                System.out.println("ZIPFILE="+zipFile.getFile().getAbsolutePath());
                 zipFile.extractAll(deployPath + puName);
+                System.out.println("EXTRACTING TO " + deployPath + puName);
             } catch (ZipException e) {
                 e.printStackTrace();
             }

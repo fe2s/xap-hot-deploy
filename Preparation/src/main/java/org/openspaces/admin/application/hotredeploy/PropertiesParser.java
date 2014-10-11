@@ -13,17 +13,21 @@ public class PropertiesParser {
 
     public Configuration parse() throws IOException {
         String rootPath = new File("").getAbsoluteFile().getParentFile().getParent();
-        String[] pathToResources = {rootPath, "tool", "src", "main", "resources", "properties.sh"};
+        System.out.println("ROOT PATH" + rootPath);
+        String[] pathToResources = {rootPath, "properties.sh"};
         String propPath = StringUtils.join(pathToResources, File.separator);
+        System.out.println("PROP PATH" + propPath);
+
         File file = new File(propPath);
         configuration = new Configuration();
         InputStream input = new FileInputStream(file.getAbsolutePath());
         setProperties(input);
         parseProcessingUnits(file);
+        System.out.println("CONFIGURATION " + configuration);
         return configuration;
     }
 
-    private void parseProcessingUnits(File file) throws IOException {
+    public void parseProcessingUnits(File file) throws IOException {
         Reader reader = new FileReader(file);
         StreamTokenizer tokenizer = new StreamTokenizer(reader);
         Map<String,String> pus = new HashMap<String, String>();
@@ -33,7 +37,7 @@ public class PropertiesParser {
             if (res == StreamTokenizer.TT_WORD){
                 if (tokenizer.sval.equals("PU")) {
                     counter++;
-                    if (counter == 2) {
+                    if (counter == 1) {
                         int res1;
                         int lineNo = tokenizer.lineno();
                         boolean nameDefine = true;
@@ -56,6 +60,12 @@ public class PropertiesParser {
         }
         configuration.setPus(pus);
         reader.close();
+    }
+
+    public static void main(String[] args) throws IOException {
+        PropertiesParser propertiesParser = new PropertiesParser();
+        propertiesParser.parse();
+        propertiesParser.parseProcessingUnits(new File("D:\\hot-redeploy\\properties.sh"));
     }
 
     public void setProperties(InputStream input) throws IOException {
