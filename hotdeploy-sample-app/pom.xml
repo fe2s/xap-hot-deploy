@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>XapApp</artifactId>
+    <groupId>Id</groupId>
+    <version>1</version>
+    <packaging>pom</packaging>
+    <modules>
+        <module>space</module>
+        <module>controller</module>
+        <module>common</module>
+    </modules>
+    <properties>
+        <jackson.version>2.4.0</jackson.version>
+        <jaxb-api.version>2.2.11</jaxb-api.version>
+        <spring.version>3.2.4.RELEASE</spring.version>
+        <gs.version>10.0.0-11600-RELEASE</gs.version>
+    </properties>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.gigaspaces</groupId>
+            <artifactId>gs-openspaces</artifactId>
+            <version>${gs.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.gigaspaces</groupId>
+            <artifactId>gs-runtime</artifactId>
+            <version>${gs.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.0.1</version>
+            <scope>compile</scope>
+        </dependency>
+
+
+
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>org.openspaces</id>
+            <url>http://maven-repository.openspaces.org</url>
+        </repository>
+    </repositories>
+
+</project>
