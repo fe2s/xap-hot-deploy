@@ -14,6 +14,6 @@
         The SLA bean also mandates that a primary and a backup won't run under the same
         GSC by setting the maxInstancesPerVM to 1.
     -->
-    <os-sla:sla  number-of-instances="3" number-of-backups="1" max-instances-per-vm="1">
+    <os-sla:sla  number-of-instances="2" number-of-backups="1" max-instances-per-vm="1">
     </os-sla:sla>
 </beans>

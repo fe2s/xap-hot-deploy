@@ -2,7 +2,6 @@ package com.cinema.controller;
 
 import com.cinema.entity.Movie;
 import com.cinema.entity.Status;
-import org.apache.bcel.generic.NEW;
 import org.openspaces.core.GigaSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
