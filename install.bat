@@ -36,8 +36,7 @@ goto :loop
 SET PUS=%PUS%)
 ECHO %PUS%
 
-SET /p GIGASPACES_LOCATION="Please enter path to gigaspaces directory. (D:\gigaspaces-xap-premium-10.0.1-ga): " %=%
-set GIGASPACES_LOCATION=%GIGASPACES_LOCATION:\=\\%
+set GIGASPACES_LOCATION=%GS_HOME:\=\\%
 ECHO %GIGASPACES_LOCATION%
 
 SET /p LOCATORS="Please enter locators, e.g. ("10.6.133.203:4174"): " %=%
@@ -61,7 +60,7 @@ xcopy tool\target\HotRedeploy-jar-with-dependencies.jar %INSTALL_DIR%
 xcopy tmp\* %INSTALL_DIR%
 rd /s /Q tmp
 xcopy run.bat %INSTALL_DIR%
-xcopy Preparation %INSTALL_DIR%\Preparation /E
+xcopy Preparation\* %INSTALL_DIR%\Preparation\* /E
 
 cd %INSTALL_DIR%
 

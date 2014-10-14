@@ -15,7 +15,7 @@
         <module>Preparation</module>
     </modules>
     <properties>
-        <gigaspacesVersion>9.7.0-10496-RELEASE</gigaspacesVersion>
+        <gigaspacesVersion>10.0.0-11600-RELEASE</gigaspacesVersion>
         <skipTests>true</skipTests>
     </properties>
 
