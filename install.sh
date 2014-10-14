@@ -1,9 +1,9 @@
 #!/bin/bash
 #check sudo
-if [[ $EUID -ne 0 ]]; then
-    echo "This script should not be run using sudo or as the root user"
-    exit 1
-fi
+#if [[ $EUID -ne 0 ]]; then
+#    echo "This script should not be run using sudo or as the root user"
+#    exit 1
+#fi
 
 CWD=$(pwd)
 
@@ -29,21 +29,24 @@ do
   echo $PU_FILE
   PUS=$PUS"[$PU_NAME]=$PU_FILE"
   read -p "Do you want to redeploy more units (y/n) : " RESP
-  if [ "$RESP" = "n" ]; then
+  if [ "$RESP" = "y" ]; then
+    PUS=$PUS" "
+  else
     PUS=$PUS")"
     break
-  elif [ "$RESP" = "y" ]; then
-    PUS=$PUS","
-  else
-    echo "OK"
   fi
 done
 
 echo $PUS
 
-# path to gigaspace directory, e.g. "/home/user/gigaspaces-xap-premium-9.7.1-ga"
-read -p "Please enter path to gigaspace directory, e.g. /home/user/gigaspaces-xap-premium-9.7.1-ga : " GIGASPACES_LOCATION
+
+#if [ -z "${!GS_HOME}" ]; then
+GIGASPACES_LOCATION=${GS_HOME%/}
 echo $GIGASPACES_LOCATION
+#else
+ # read -p "Please enter path to gigaspace directory, e.g. /home/user/gigaspaces-xap-premium-9.7.1-ga : " GIGASPACES_LOCATION
+ # 
+#fi
 
 # gigaspace locator to cluster, e.g. "127.0.0.1"
 read -p "Please enter locators (format: 10.0.2.15:4174,10.0.2.16:4174) : " LOCATORS
@@ -55,6 +58,7 @@ echo $LOOKUP_GROUPS
 
 #installation dir
 read -p "Please enter path to installation directory: " installDir
+installDir=${installDir%/}
 echo $installDir
 
 #------MOVE TO ANOTHER PLACE--------

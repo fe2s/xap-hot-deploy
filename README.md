@@ -29,8 +29,8 @@ Note, that tests will be skipped in this case. How to build with tests see in Te
 Run
 ---
 
-1. Copy `XAP-hot-redeploy-0.0.1-SNAPSHOT.zip` to any host where the script will be run from. 
-2. Unzip `XAP-hot-redeploy-0.0.1-SNAPSHOT.zip` file.
+1. Copy `tool/target/HotRedeploy.zip` to any host where the script will be run from.
+2. Unzip `tool/target/HotRedeploy.zip` file.
 3. Configure password-less ssh connection between client machine and GSM hosts (see [SSH login without password] page for instruction).
 4. Copy jar file with new classes to the folder with .sh file.
 5. Configure options in `properties.sh` file.

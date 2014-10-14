@@ -12,7 +12,7 @@
     <modules>
         <module>test-pu</module>
         <module>tool</module>
-        <module>preparation</module>
+        <module>Preparation</module>
     </modules>
     <properties>
         <gigaspacesVersion>9.7.0-10496-RELEASE</gigaspacesVersion>
