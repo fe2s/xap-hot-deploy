@@ -23,4 +23,6 @@ http://www.springframework.org/schema/context
     <os-core:giga-space id="gigaSpace" space="space"/>
 
     <os-remoting:service-exporter id="serviceExporter" />
+
+    <bean id="test" class="org.openspaces.admin.application.hotredeploy.InitBean" />
 </beans>

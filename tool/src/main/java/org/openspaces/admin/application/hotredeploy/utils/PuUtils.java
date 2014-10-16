@@ -10,6 +10,7 @@ import org.openspaces.admin.pu.ProcessingUnit;
 import org.openspaces.admin.pu.ProcessingUnitInstance;
 import org.openspaces.admin.pu.ProcessingUnitType;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -49,7 +50,7 @@ public class PuUtils {
      * @return discovered pu instances
      */
     public static ProcessingUnitInstance[] getStatefulPuInstances(ProcessingUnit processingUnit, Config config){
-        ProcessingUnitInstance[] puInstances = getPuInstances(processingUnit);
+        ProcessingUnitInstance[] puInstances = getPuInstances(processingUnit, config);
         identSpaceMode(puInstances, config);
         return puInstances;
     }
@@ -59,28 +60,37 @@ public class PuUtils {
      * @param processingUnit current pu.
      * @return pu instances
      */
-    public static ProcessingUnitInstance[] getPuInstances(ProcessingUnit processingUnit) {
-        int i = processingUnit.getPlannedNumberOfInstances();
+    public static ProcessingUnitInstance[] getPuInstances(ProcessingUnit processingUnit, Config config) {
         // Wait for all the members to be discovered\
-        // TODO 15 to config
-        processingUnit.waitFor(i, 15, TimeUnit.SECONDS);
+        processingUnit.waitFor(processingUnit.getPlannedNumberOfInstances(), config.getIdentifyInstancesTimeout(), TimeUnit.SECONDS);
         return processingUnit.getInstances();
     }
 
     /**
      * Restart all discovered pus.
      */
-    public static void restartAllPUs(PuManager puManager, Config config, RollbackChecker rollbackChecker) {
+    public static boolean restartAllPUs(PuManager puManager, Config config, RollbackChecker rollbackChecker) {
+        return restartPUs(puManager, config.getPuToRestart(), config, rollbackChecker);
+    }
+
+    public static boolean restartPUs(PuManager puManager, List<String> puNames, Config config, RollbackChecker rollbackChecker){
         PuRestarter puRestarter;
-        List<ProcessingUnit> processingUnits = puManager.identProcessingUnits();
+        boolean rollback = false;
+        List<ProcessingUnit> processingUnits = puManager.identProcessingUnits(puNames);
+        List<String> restartedPuNames = new ArrayList<String>();
         for (ProcessingUnit processingUnit : processingUnits) {
             if (processingUnit.getType() == ProcessingUnitType.STATEFUL) {
                 puRestarter = new StatefulPuRestarter(config, rollbackChecker);
             } else {
-                puRestarter = new StatelessPuRestarter();
+                puRestarter = new StatelessPuRestarter(config);
             }
-            puRestarter.restart(processingUnit);
+            rollback = puRestarter.restart(processingUnit);
+            if (rollback) break;
+            restartedPuNames.add(processingUnit.getName());
         }
+        if (rollback) {
+            restartPUs(puManager, restartedPuNames, config, rollbackChecker);
+        }
+        return rollback;
     }
-
 }

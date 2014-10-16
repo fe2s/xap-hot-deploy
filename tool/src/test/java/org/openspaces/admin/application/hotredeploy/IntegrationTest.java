@@ -7,6 +7,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openspaces.admin.Admin;
 import org.openspaces.admin.AdminException;
@@ -22,6 +23,8 @@ import org.openspaces.core.space.UrlSpaceConfigurer;
 import org.openspaces.remoting.ExecutorRemotingProxyConfigurer;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
@@ -31,7 +34,7 @@ import static org.junit.Assert.assertNotNull;
  * Hot redeploy integration test.
  * First deploys v0 stateful PU, calls remote service, redeploys v1 and calls remote service again to check that
  * service implementation changed.
- *
+ * <p/>
  * PREREQUISITES:
  * - run gs-agent.sh/bat
  * - lookup group and locator should be set to default values
@@ -42,80 +45,38 @@ import static org.junit.Assert.assertNotNull;
  */
 public class IntegrationTest {
 
-    private String rootPath;
+    private String rootPath = new File("").getAbsolutePath();
     private ProcessingUnit space;
     private String gsLocation;
 
     public static Logger log = LogManager.getLogger(IntegrationTest.class);
 
+    @BeforeClass
+    public static void beforeClass(){
+        List<String> list = new ArrayList<String>();
+        for(int i = 0; i < 3; i ++) {
+            list.add("y");
+            list.add(System.lineSeparator());
+        }
+        MockedConsole console = new MockedConsole(list);
+        System.setIn(console);
+    }
+
     @Before
     public void before() throws InterruptedException {
-        Admin admin = new AdminFactory().create();
-        rootPath = new File("").getAbsoluteFile().getParent();
-        String[] pathToJar = {"test-pu", "v0", "target", "space.jar"};
-        File puArchive = new File(rootPath + File.separator + StringUtils.join(pathToJar, File.separator));
-        log.info("puArchive " + puArchive);
-        try {
-            GridServiceManagers managers = admin.getGridServiceManagers();
-            managers.waitFor(1);
-            space = managers.deploy(new ProcessingUnitDeployment(puArchive));
-            space.waitFor(4);
-        } catch (AdminException e) {
-            throw new HotRedeployException("Unable to identify GSM or Space. Make sure you have default lookup group and locator. Make sure that there is no pu with name \"space\" deployed already", e);
-        }
+        space = deployV0();
     }
 
     @Test
-    public void test() throws IOException, InterruptedException {
-        GigaSpace gigaSpace = new GigaSpaceConfigurer(new UrlSpaceConfigurer("jini://*/*/space")).gigaSpace();
-
-        // check v0 deployed
-        TestAction testAction = new ExecutorRemotingProxyConfigurer<TestAction>(gigaSpace, TestAction.class).proxy();
-        assertEquals("v0", testAction.doAction());
-        gigaSpace.write(new Person("1"));
-
-        // unzip new jar version
-        String deployPath = getAndClearDeployDirectory();
-        unzipNewSpaceJar(deployPath);
-        Thread.sleep(1000);
-
-        // run redeploy
-        String args[] = {"-pun", "space", "-put", "1000", "-smt", "1000", "-s", "false", "-dr", "true", "-lcm", "true", gsLocation};
-        ByteArrayInputStream in = new ByteArrayInputStream("y".getBytes());
-        System.setIn(in);
-        HotRedeployMain.main(args);
-
-        // check v1 deployed
-        assertEquals( "v1", testAction.doAction());
-        Person person = gigaSpace.readById(Person.class, "1");
-        assertNotNull(person);
+    public void testCorrectRedeploy() throws IOException, InterruptedException {
+        testActions("v1", "v1");
     }
 
-    private void unzipNewSpaceJar(String deployPath) {
-        String[] pathToJar = {"test-pu", "v1", "target", "space.jar"};
-        String source = rootPath + File.separator + StringUtils.join(pathToJar, File.separator);
-        log.info(source);
-
-        log.info(deployPath);
-        try {
-            ZipFile zipFile = new ZipFile(source);
-            zipFile.extractAll(deployPath);
-        } catch (ZipException e) {
-            log.error(e.getMessage());
-        }
+    @Test
+    public void testRollback() throws IOException, InterruptedException {
+        testActions("v2", "v0");
     }
 
-    private String getAndClearDeployDirectory() {
-        gsLocation = getGsLocation();
-        if (gsLocation == null) {
-            throw new HotRedeployException("You should specified path to gigaspace folder in config.properties file");
-        }
-        String[] pathToDeployFolder = {"deploy", "space"};
-        File oldFiles = new File(gsLocation + File.separator + StringUtils.join(pathToDeployFolder, File.separator));
-        String deployPath = oldFiles.getPath();
-        FileUtils.deleteDirectory(oldFiles);
-        return deployPath;
-    }
 
     @After
     public void after() {
@@ -123,8 +84,51 @@ public class IntegrationTest {
     }
 
 
+    public void testActions(String moduleName, String resultString) throws InterruptedException {
+        GigaSpace gigaSpace = new GigaSpaceConfigurer(new UrlSpaceConfigurer("jini://*/*/space")).gigaSpace();
 
-    public static String getGsLocation() {
+        // check start deployed version
+        TestAction testAction = new ExecutorRemotingProxyConfigurer<TestAction>(gigaSpace, TestAction.class).proxy();
+        assertEquals("v0", testAction.doAction());
+        gigaSpace.write(new Person("1"));
+
+        // unzip new jar version
+        String deployPath = getAndClearDeployDirectory();
+        unzipNewSpaceJar(deployPath, moduleName);
+        Thread.sleep(1000);
+
+        // run redeploy
+        String args[] = {"-pun", "space", "-put", "20", "-smt", "20", "-s", "false", "-dr", "false", "-lcm", "true", "-gsloc", gsLocation, "-rt", "30", "-inst", "20"};
+        HotRedeployMain.main(args);
+
+        // check deployed version after redeploy
+        assertEquals(resultString, testAction.doAction());
+        Person person = gigaSpace.readById(Person.class, "1");
+        assertNotNull(person);
+    }
+
+    public ProcessingUnit deployV0() {
+        Admin admin = new AdminFactory().create();
+        String[] pathToJar = {"test-pu", "v0", "target", "space.jar"};
+        File puArchive = new File(rootPath + File.separator + StringUtils.join(pathToJar, File.separator));
+        log.info("puArchive " + puArchive);
+        ProcessingUnit space;
+        try {
+            GridServiceManagers managers = admin.getGridServiceManagers();
+            log.info("manager");
+            managers.waitFor(1);
+            log.info(managers.getUids());
+            space = managers.deploy(new ProcessingUnitDeployment(puArchive));
+            log.info("space");
+            space.waitFor(2);
+            log.info(space);
+        } catch (AdminException e) {
+            throw new HotRedeployException("Unable to identify GSM or Space. Make sure you have default lookup group and locator. Make sure that there is no pu with name \"space\" deployed already", e);
+        }
+        return space;
+    }
+
+    public String getGsLocation() {
         Properties prop = new Properties();
         InputStream input = null;
 
@@ -146,5 +150,32 @@ public class IntegrationTest {
             }
         }
     }
+
+    private void unzipNewSpaceJar(String deployPath, String moduleName) {
+        String[] pathToJar = {"test-pu", moduleName, "target", "space.jar"};
+        String source = rootPath + File.separator + StringUtils.join(pathToJar, File.separator);
+        log.info(source);
+
+        log.info(deployPath);
+        try {
+            ZipFile zipFile = new ZipFile(source);
+            zipFile.extractAll(deployPath);
+        } catch (ZipException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    private String getAndClearDeployDirectory() {
+        gsLocation = getGsLocation();
+        if (gsLocation == null) {
+            throw new HotRedeployException("You should specified path to gigaspaces folder in config.properties file");
+        }
+        String[] pathToDeployFolder = {"deploy", "space"};
+        File oldFiles = new File(gsLocation + File.separator + StringUtils.join(pathToDeployFolder, File.separator));
+        String deployPath = oldFiles.getPath();
+        FileUtils.deleteDirectory(oldFiles);
+        return deployPath;
+    }
+
 
 }

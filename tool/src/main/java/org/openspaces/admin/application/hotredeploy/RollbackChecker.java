@@ -6,6 +6,8 @@ import org.openspaces.admin.application.hotredeploy.config.Config;
 import org.openspaces.admin.application.hotredeploy.exceptions.HotRedeployException;
 import org.openspaces.admin.application.hotredeploy.files.FileManager;
 import org.openspaces.admin.application.hotredeploy.utils.PuUtils;
+import org.openspaces.admin.application.hotredeploy.utils.ScannerHolder;
+import org.openspaces.admin.gsc.GridServiceContainer;
 import org.openspaces.admin.gsm.GridServiceManager;
 import org.openspaces.admin.pu.ProcessingUnit;
 import org.openspaces.admin.pu.ProcessingUnitInstance;
@@ -33,11 +35,10 @@ public class RollbackChecker {
         this.sshFileManager = sshFileManager;
     }
 
-    public void checkForErrors() {
-        List<ProcessingUnit> processingUnits = puManager.identProcessingUnits();
+    private void checkForErrors() {
+        List<ProcessingUnit> processingUnits = puManager.identProcessingUnits(config.getPuToRestart());
         for (ProcessingUnit processingUnit : processingUnits) {
-            //TODO Add 15 to config
-            processingUnit.waitFor(processingUnit.getPlannedNumberOfInstances(), 15, TimeUnit.SECONDS);
+            processingUnit.waitFor(processingUnit.getPlannedNumberOfInstances(), config.getIdentifyInstancesTimeout(), TimeUnit.SECONDS);
             ProcessingUnitInstance[] instances = processingUnit.getInstances();
             if (instances.length != processingUnit.getPlannedNumberOfInstances()) {
                 throw new HotRedeployException("Processing unit instances has been lost");
@@ -48,59 +49,80 @@ public class RollbackChecker {
         }
     }
 
-    public boolean isRollbackNeed(String message) {
+    private boolean checkWithUser(String message) {
         System.out.println(message + " Do you want to rollback? [y]es/[n]o: ");
-        Scanner sc = new Scanner(System.in);
-        String answer = sc.next();
+        Scanner sc = ScannerHolder.getScanner();
+        String answer = sc.nextLine();
         while (!(("y".equals(answer)) || ("n".equals(answer)))) {
             System.out.println("Error: invalid response [" + answer + "]. Try again.");
-            answer = sc.next();
+            answer = sc.nextLine();
         }
         return "y".equals(answer);
     }
 
-    public void doRollback(Config config) {
+    private void doRollback(Config config) {
         sshFileManager.restoreTempFolders();
-        log.info("do rollback");
+        log.info("Do rollback..");
         GridServiceManager[] managers = puManager.getMangers();
-        int numberOfManagers = managers.length;
-        if (numberOfManagers > 1) {
-            for (GridServiceManager gsm:managers){
-                gsm.restart();
-                try {
-                while (puManager.getMangers().length < numberOfManagers) {
-                    Thread.sleep(PAUSE);
-                }
-                    Thread.sleep(WAIT_FOR_GSM_INIT);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
+        if (managers.length > 1) {
+            log.info("Find backup GSM in system Restarting GSMs..");
+            restartGSMs(managers);
         } else {
-            throw new HotRedeployException("There is 1 GSM in system");
+            log.info("There is one GSM in system. Try to find empty GSC");
+            GridServiceContainer gsc = findEmptyContainer();
+            if (gsc != null) {
+                log.info("Restarting GSC with id " + gsc.getAgentId());
+               gsc.restart();
+            } else throw new HotRedeployException("There is no empty GSC in system. If you want to rollback please start new GSC manually");
         }
-        List<ProcessingUnit> processingUnits = puManager.identProcessingUnits();
+        List<ProcessingUnit> processingUnits = puManager.identProcessingUnits(config.getPuToRestart());
         for (ProcessingUnit processingUnit : processingUnits) {
             processingUnit.waitFor(processingUnit.getPlannedNumberOfInstances(), config.getRestartTimeout(), TimeUnit.SECONDS);
         }
-        log.info("done");
+        log.info("Rollback completed successfully");
 
     }
 
-    // TODO rename it
-    public boolean tryRollback(String message){
-        //TODO rename
-        boolean rollback = false;
+    public boolean checkForRollback(String message){
+        boolean isRollbackDone = false;
         try{
             checkForErrors();
         } catch (HotRedeployException e) {
-            rollback = true;
-            if(isRollbackNeed(message)){
+            isRollbackDone = true;
+            if(checkWithUser(message)){
                 doRollback(config);
             } else {
-                throw new HotRedeployException("No rollback");
+                throw new HotRedeployException("Hot redeploy failed. Rollback canceled by user.");
             }
         }
-        return rollback;
+        return isRollbackDone;
+    }
+
+
+    private void restartGSMs(GridServiceManager[] managers){
+        int numberOfManagers = managers.length;
+        for (GridServiceManager gsm:managers){
+            log.info("Restarting gsm with id " + gsm.getAgentId());
+            gsm.restart();
+            try {
+                while (puManager.getMangers().length < numberOfManagers) {
+                    Thread.sleep(PAUSE);
+                }
+                Thread.sleep(WAIT_FOR_GSM_INIT);
+            } catch (InterruptedException e) {
+                log.error(e);
+            }
+            log.info("done");
+        }
+    }
+
+    private GridServiceContainer findEmptyContainer(){
+        GridServiceContainer[] containers = puManager.getContainers();
+        for (GridServiceContainer gsc : containers){
+            if (gsc.getProcessingUnitInstances().length == 0) {
+                return gsc;
+            }
+        }
+        return null;
     }
 }

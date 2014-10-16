@@ -49,4 +49,20 @@ public class LocalFileManager implements FileManager {
         File tempDirPu = new File(tempDir + File.separator + "pu");
         FileUtils.deleteDirectory(tempDirPu);
     }
+
+    public void createTempFolder(){
+        String tempDir = System.getProperty("java.io.tmpdir");
+        File dest= new File(tempDir + File.separator + "pu");
+        dest.mkdir();
+        for (String puName: config.getPuToRestart()){
+            String sourcePath = StringUtils.join(new String[]{config.getGigaspacesLocation(),"deploy",puName}, File.separator);
+            File srcFile = new File(sourcePath);
+            File destFile = new File(dest.getAbsolutePath() + File.separator + puName);
+            try {
+                FileUtils.copyFolder(srcFile, destFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

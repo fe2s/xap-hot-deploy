@@ -4,7 +4,6 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.openspaces.admin.application.hotredeploy.config.Config;
 import org.openspaces.admin.application.hotredeploy.config.ConfigInitializer;
-import org.openspaces.admin.application.hotredeploy.exceptions.HotRedeployException;
 import org.openspaces.admin.application.hotredeploy.files.FileManager;
 import org.openspaces.admin.application.hotredeploy.files.LocalFileManager;
 import org.openspaces.admin.application.hotredeploy.files.SSHFileManager;
@@ -16,15 +15,17 @@ public class HotRedeployMain {
 
     public static final String FAILURE = "Hot redeploy failed";
     public static final String SUCCESS = "Hot redeploy completed successfully";
+    public static final String ROLLBACK = "Hot redeploy failed. Rollback successfully completed";
     public static Logger log = LogManager.getLogger(HotRedeployMain.class);
 
     public static void main(String[] args) {
         ConfigInitializer.checkFiles();
         Config config = ConfigInitializer.init(args);
+        LocalFileManager fileManager1 = new LocalFileManager(config);
+        fileManager1.createTempFolder();
         PuManager puManager = new PuManager(config);
         FileManager fileManager = getFileManager(config);
         puManager.createAdmin();
-
         try {
             redeploy(puManager, config, fileManager);
         } finally {
@@ -34,12 +35,14 @@ public class HotRedeployMain {
     }
 
     private static void redeploy(PuManager puManager, Config config, FileManager fileManager) {
-
         RollbackChecker rollbackChecker = new RollbackChecker(config, puManager, fileManager);
-        PuUtils.restartAllPUs(puManager, config, rollbackChecker);
+        boolean rollback = PuUtils.restartAllPUs(puManager, config, rollbackChecker);
+        if (!rollback){
+            log.info(SUCCESS);
+        } else {
+            log.warn(ROLLBACK);
+        }
 
-
-        log.info(SUCCESS);
     }
 
     private static FileManager getFileManager(Config config) {

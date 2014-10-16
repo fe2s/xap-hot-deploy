@@ -5,6 +5,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.openspaces.admin.application.hotredeploy.exceptions.HotRedeployException;
 import org.openspaces.admin.application.hotredeploy.HotRedeployMain;
+import org.openspaces.admin.application.hotredeploy.utils.ScannerHolder;
 
 import java.util.Scanner;
 
@@ -29,6 +30,7 @@ public class ConfigInitializer {
         log.info("Locator: " + config.getLocator());
         log.info("Lookup group: " + config.getLookupGroup());
         log.info("Timeout for identify pu: " + config.getIdentifyPuTimeout());
+        log.info("Timeout for identify instances: " + config.getIdentifyInstancesTimeout());
         log.info("Timeout for identify space mode: " + config.getIdentifySpaceModeTimeout());
         log.info("Timeout for restart " + config.getRestartTimeout());
         log.info("Secured: " + config.isSecured());
@@ -44,11 +46,11 @@ public class ConfigInitializer {
      */
     public static void checkFiles() {
         System.out.println("Are you sure that new files placed on all GSM machines? [y]es, [n]o: ");
-        Scanner sc = new Scanner(System.in);
-        String answer = sc.next();
+        Scanner sc = ScannerHolder.getScanner();
+        String answer = sc.nextLine();
         while (!(("y".equals(answer)) || ("n".equals(answer)))) {
             System.out.println("Error: invalid response [" + answer + "]. Try again.");
-            answer = sc.next();
+            answer = sc.nextLine();
         }
         if ("n".equals(answer)) {
             String cause = "Please place new files on all GSM machines and try again.";

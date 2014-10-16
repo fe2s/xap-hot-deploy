@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.openspaces.admin.application.hotredeploy.config.Config;
 import org.openspaces.admin.application.hotredeploy.exceptions.HotRedeployException;
 import org.openspaces.admin.application.hotredeploy.utils.PuUtils;
+import org.openspaces.admin.application.hotredeploy.utils.ScannerHolder;
 import org.openspaces.admin.pu.ProcessingUnit;
 import org.openspaces.admin.pu.ProcessingUnitInstance;
 
@@ -38,7 +39,7 @@ public class StatefulPuRestarter implements PuRestarter {
      *
      * @param processingUnit current pu (stateful)
      */
-    public void restart(ProcessingUnit processingUnit) {
+    public boolean restart(ProcessingUnit processingUnit) {
         ProcessingUnitInstance[] puInstances = PuUtils.getStatefulPuInstances(processingUnit, config);
         try {
             Thread.sleep(1000);
@@ -61,7 +62,7 @@ public class StatefulPuRestarter implements PuRestarter {
             primariesThreads = 1;
         }
         ExecutorService primaryService = Executors.newFixedThreadPool(primariesThreads);
-        restartAllInstances(processingUnit, backupService, primaryService);
+        return restartAllInstances(processingUnit, backupService, primaryService);
     }
 
     /**
@@ -78,11 +79,11 @@ public class StatefulPuRestarter implements PuRestarter {
         }
         if (findBackups == 0) {
             System.out.println("No backups find. ALL SPACE DATA WILL BE LOST. Do you want to continue? [y]es, [n]o:");
-            Scanner sc = new Scanner(System.in);
-            String answer = sc.next();
+            Scanner sc = ScannerHolder.getScanner();
+            String answer = sc.nextLine();
             while (!(("y".equals(answer)) || ("n".equals(answer)))) {
                 System.out.println("Error: invalid response [" + answer + "]. Try again.");
-                answer = sc.next();
+                answer = sc.nextLine();
             }
             if ("n".equals(answer)) {
                 String cause = "Hot redeploy was terminated, because no backups find";
@@ -100,21 +101,22 @@ public class StatefulPuRestarter implements PuRestarter {
      * @param backupService  executor service for restart all backups at the same time
      * @param primaryService executor service for restart all primaries at the same time
      */
-    private void restartAllInstances(ProcessingUnit processingUnit, ExecutorService backupService, ExecutorService primaryService) {
+    private boolean restartAllInstances(ProcessingUnit processingUnit, ExecutorService backupService, ExecutorService primaryService) {
         log.info("Restarting pu " + processingUnit.getName() + " with type " + processingUnit.getType());
         ProcessingUnitInstance[] puInstances = PuUtils.getStatefulPuInstances(processingUnit, config);
         restartBackups(puInstances, backupService);
-        boolean rollback = rollbackChecker.tryRollback("Backup restarting fails. If you don't rollback all data will be lost");
+        boolean rollback = rollbackChecker.checkForRollback("Backup restarting fails. If you don't rollback all data will be lost");
         if (!rollback) {
             restartPrimaries(puInstances, primaryService);
-            rollback = rollbackChecker.tryRollback("Primary restarting fails. If you don't rollback all data will be lost");
+            rollback = rollbackChecker.checkForRollback("Primary restarting fails. If you don't rollback all data will be lost");
             if ((!rollback) && (config.isDoubleRestart())){
                     puInstances = PuUtils.getStatefulPuInstances(processingUnit, config);
                     primaryService = Executors.newFixedThreadPool(1);
                     restartPrimaries(puInstances, primaryService);
-                    rollbackChecker.tryRollback("Primary restarting fails. If you don't rollback all data will be lost");
+                    rollback = rollbackChecker.checkForRollback("Primary restarting fails. If you don't rollback all data will be lost");
             }
         }
+        return rollback;
     }
 
     /**

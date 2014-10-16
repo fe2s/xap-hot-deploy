@@ -7,6 +7,7 @@ import org.openspaces.admin.AdminFactory;
 import org.openspaces.admin.application.hotredeploy.config.Config;
 import org.openspaces.admin.application.hotredeploy.exceptions.HotRedeployException;
 import org.openspaces.admin.gsa.GridServiceAgent;
+import org.openspaces.admin.gsc.GridServiceContainer;
 import org.openspaces.admin.gsm.GridServiceManager;
 import org.openspaces.admin.gsm.GridServiceManagers;
 import org.openspaces.admin.pu.ProcessingUnit;
@@ -61,9 +62,9 @@ public class PuManager {
         }
     }
 
-    public List<ProcessingUnit> identProcessingUnits() {
+    public List<ProcessingUnit> identProcessingUnits(List<String> names) {
         List<ProcessingUnit> processingUnits = new ArrayList<ProcessingUnit>();
-        for (String name : config.getPuToRestart()) {
+        for (String name : names) {
             ProcessingUnit processingUnit = admin.getProcessingUnits().waitFor(name, config.getIdentifyPuTimeout(), TimeUnit.SECONDS);
             if (processingUnit == null) {
                 String cause = "can't get PU instances for " + name;
@@ -78,6 +79,10 @@ public class PuManager {
 
     public GridServiceManager[] getMangers(){
         return admin.getGridServiceManagers().getManagers();
+    }
+
+    public GridServiceContainer[] getContainers() {
+        return admin.getGridServiceContainers().getContainers();
     }
 
 

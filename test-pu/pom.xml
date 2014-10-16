@@ -17,6 +17,7 @@
         <module>v0</module>
         <module>v1</module>
         <module>common</module>
+        <module>v2</module>
     </modules>
     <dependencies>
         <dependency>
