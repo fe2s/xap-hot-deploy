@@ -19,14 +19,22 @@ LOOKUP_GROUP=
 # timeout for identify PU (in seconds), e.g. "60"
 IDENT_PU_TIMEOUT="60"
 
-# timeout for identify space mode (in seconds), e.g. '60'
+# timeout for identify space mode (in seconds), e.g. "60"
 IDENT_SPACE_MODE_TIMEOUT="60"
 
 # timeout for restarting pu in seconds
 RESTART_TIMEOUT="60"
+
+# timeout for identify pu instances (in seconds), e.g. "60"
+IDENTIFY_INSTANCES_TIMEOUT="60"
+
+# set true, if you want to run tool in local cluster mode
+LOCAL_CLUSTER_MODE="true"
 
 # set "true" if space secured, set "false" if space not secured
 IS_SECURED="false"
 
 # set "true" if all instances should placed in "original" vm after redeploy
 DOUBLE_RESTART="false"
+
+
