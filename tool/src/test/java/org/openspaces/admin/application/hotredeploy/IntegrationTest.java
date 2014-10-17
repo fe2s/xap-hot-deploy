@@ -45,7 +45,7 @@ import static org.junit.Assert.assertNotNull;
  */
 public class IntegrationTest {
 
-    private String rootPath = new File("").getAbsolutePath();
+    private String rootPath = new File("").getAbsoluteFile().getParent();
     private ProcessingUnit space;
     private String gsLocation;
 
@@ -115,15 +115,11 @@ public class IntegrationTest {
         ProcessingUnit space;
         try {
             GridServiceManagers managers = admin.getGridServiceManagers();
-            log.info("manager");
             managers.waitFor(1);
-            log.info(managers.getUids());
             space = managers.deploy(new ProcessingUnitDeployment(puArchive));
-            log.info("space");
             space.waitFor(2);
-            log.info(space);
         } catch (AdminException e) {
-            throw new HotRedeployException("Unable to identify GSM or Space. Make sure you have default lookup group and locator. Make sure that there is no pu with name \"space\" deployed already", e);
+            throw new HotRedeployException("Unable to identify GSM or Space. Make sure you have default lookup group and locator. Make sure that there is no pu with name \"space\" deployed already" + e.getMessage());
         }
         return space;
     }
