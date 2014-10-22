@@ -60,6 +60,7 @@ public class RollbackChecker {
         return "y".equals(answer);
     }
 
+    //Add javadoc with explanation of GSM/empty GSC restarting logic
     private void doRollback(Config config) {
         sshFileManager.restoreTempFolders();
         log.info("Do rollback..");
@@ -73,7 +74,9 @@ public class RollbackChecker {
             if (gsc != null) {
                 log.info("Restarting GSC with id " + gsc.getAgentId());
                gsc.restart();
-            } else throw new HotRedeployException("There is no empty GSC in system. If you want to rollback please start new GSC manually");
+            } else {
+                throw new HotRedeployException("There is no empty GSC in system. If you want to rollback please start new GSC manually");
+            }
         }
         List<ProcessingUnit> processingUnits = puManager.identProcessingUnits(config.getPuToRestart());
         for (ProcessingUnit processingUnit : processingUnits) {
@@ -105,6 +108,7 @@ public class RollbackChecker {
             log.info("Restarting gsm with id " + gsm.getAgentId());
             gsm.restart();
             try {
+                // can it be replaced by admin.getGridServiceManagers().wait(numberOfManagers) ?
                 while (puManager.getMangers().length < numberOfManagers) {
                     Thread.sleep(PAUSE);
                 }
