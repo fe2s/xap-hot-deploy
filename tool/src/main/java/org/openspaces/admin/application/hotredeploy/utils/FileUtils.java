@@ -5,6 +5,9 @@ import java.io.*;
 /**
  * @author Anna_Babich
  */
+
+//This class should be substituted by apache-commons-io FileUtils
+
 public class FileUtils {
 
     /**

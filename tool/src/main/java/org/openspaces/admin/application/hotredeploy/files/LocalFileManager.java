@@ -16,8 +16,11 @@ public class LocalFileManager implements FileManager {
 
     private Config config;
 
+    private String tempDir;
+
     public LocalFileManager(Config config) {
         this.config = config;
+        this.tempDir = System.getProperty("java.io.tmpdir");
     }
 
     @Override
@@ -28,8 +31,6 @@ public class LocalFileManager implements FileManager {
             String folderPath = StringUtils.join(new String[]{gigaspacesLocation,"deploy",puName}, File.separator);
             File puFolder = new File(folderPath);
             FileUtils.deleteDirectory(puFolder);
-
-            String tempDir = System.getProperty("java.io.tmpdir");
             String tempFolderPath = StringUtils.join(new String[]{tempDir,"pu",puName}, File.separator);
             File tempPuFolder = new File(tempFolderPath);
 
@@ -45,13 +46,11 @@ public class LocalFileManager implements FileManager {
 
     @Override
     public void removeFolder() {
-        String tempDir = System.getProperty("java.io.tmpdir");
         File tempDirPu = new File(tempDir + File.separator + "pu");
         FileUtils.deleteDirectory(tempDirPu);
     }
 
     public void createTempFolder(){
-        String tempDir = System.getProperty("java.io.tmpdir");
         File dest= new File(tempDir + File.separator + "pu");
         dest.mkdir();
         for (String puName: config.getPuToRestart()){
@@ -61,7 +60,7 @@ public class LocalFileManager implements FileManager {
             try {
                 FileUtils.copyFolder(srcFile, destFile);
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new HotRedeployException(e);
             }
         }
     }

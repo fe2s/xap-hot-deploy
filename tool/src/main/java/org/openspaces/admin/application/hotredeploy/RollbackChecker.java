@@ -90,8 +90,8 @@ public class RollbackChecker {
     /**
      * Do rollback actions.
      * If there are more than one GSM in system, they will be restarted one by one.
-     * If there is only one GSM in system, tool look for empty GSC and restart it.
-     * If backup GSM and empty container not found rollback failed and system state is unstable.
+     * If there is only one GSM in system => tool looks for empty GSC and restarts it.
+     * If backup GSM and empty container were not found => rollback fails and system is in unstable state.
      *
      * @param config config tool information.
      */
