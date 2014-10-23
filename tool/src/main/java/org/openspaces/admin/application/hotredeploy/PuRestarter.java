@@ -15,5 +15,5 @@ public interface PuRestarter {
      * Restart PU.
      * @param processingUnit current pu
      */
-    public abstract boolean restart(ProcessingUnit processingUnit);
+    boolean restart(ProcessingUnit processingUnit);
 }

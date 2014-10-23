@@ -21,8 +21,8 @@ public class HotRedeployMain {
     public static void main(String[] args) {
         ConfigInitializer.checkFiles();
         Config config = ConfigInitializer.init(args);
-        LocalFileManager fileManager1 = new LocalFileManager(config);
-        fileManager1.createTempFolder();
+        LocalFileManager localFileManager = new LocalFileManager(config);
+        localFileManager.createTempFolder();
         PuManager puManager = new PuManager(config);
         FileManager fileManager = getFileManager(config);
         puManager.createAdmin();
@@ -45,6 +45,7 @@ public class HotRedeployMain {
 
     }
 
+    // Abstract.. pattern =)))
     private static FileManager getFileManager(Config config) {
         FileManager fileManager;
 

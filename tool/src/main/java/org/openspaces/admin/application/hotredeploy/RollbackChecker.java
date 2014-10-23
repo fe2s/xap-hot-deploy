@@ -35,6 +35,30 @@ public class RollbackChecker {
         this.sshFileManager = sshFileManager;
     }
 
+    /**
+     * Check for errors and do rollback id it needed.
+     * @param message contains information about actions, after which system has been checked for errors.
+     * @return true, if rollback has been done.
+     */
+    public boolean checkForRollback(String message){
+        boolean isRollbackDone = false;
+        try{
+            checkForErrors();
+        } catch (HotRedeployException e) {
+            isRollbackDone = true;
+            if(checkWithUser(message)){
+                doRollback(config);
+            } else {
+                throw new HotRedeployException("Hot redeploy failed. Rollback canceled by user.");
+            }
+        }
+        return isRollbackDone;
+    }
+
+
+    /**
+     * Check system for errors.
+     */
     private void checkForErrors() {
         List<ProcessingUnit> processingUnits = puManager.identProcessingUnits(config.getPuToRestart());
         for (ProcessingUnit processingUnit : processingUnits) {
@@ -49,6 +73,9 @@ public class RollbackChecker {
         }
     }
 
+    /**
+     * When some errors occurred, check with user if rollback needed.
+     */
     private boolean checkWithUser(String message) {
         System.out.println(message + " Do you want to rollback? [y]es/[n]o: ");
         Scanner sc = ScannerHolder.getScanner();
@@ -60,7 +87,14 @@ public class RollbackChecker {
         return "y".equals(answer);
     }
 
-    //Add javadoc with explanation of GSM/empty GSC restarting logic
+    /**
+     * Do rollback actions.
+     * If there are more than one GSM in system, they will be restarted one by one.
+     * If there is only one GSM in system, tool look for empty GSC and restart it.
+     * If backup GSM and empty container not found rollback failed and system state is unstable.
+     *
+     * @param config config tool information.
+     */
     private void doRollback(Config config) {
         sshFileManager.restoreTempFolders();
         log.info("Do rollback..");
@@ -86,32 +120,18 @@ public class RollbackChecker {
 
     }
 
-    public boolean checkForRollback(String message){
-        boolean isRollbackDone = false;
-        try{
-            checkForErrors();
-        } catch (HotRedeployException e) {
-            isRollbackDone = true;
-            if(checkWithUser(message)){
-                doRollback(config);
-            } else {
-                throw new HotRedeployException("Hot redeploy failed. Rollback canceled by user.");
-            }
-        }
-        return isRollbackDone;
-    }
 
-
+    /**
+     * Restart all GSMs one by one.
+     * @param managers all found GSMs in system.
+     */
     private void restartGSMs(GridServiceManager[] managers){
         int numberOfManagers = managers.length;
         for (GridServiceManager gsm:managers){
             log.info("Restarting gsm with id " + gsm.getAgentId());
             gsm.restart();
             try {
-                // can it be replaced by admin.getGridServiceManagers().wait(numberOfManagers) ?
-                while (puManager.getMangers().length < numberOfManagers) {
-                    Thread.sleep(PAUSE);
-                }
+                puManager.waitForGSMStart(numberOfManagers);
                 Thread.sleep(WAIT_FOR_GSM_INIT);
             } catch (InterruptedException e) {
                 log.error(e);
@@ -120,6 +140,10 @@ public class RollbackChecker {
         }
     }
 
+    /**
+     * Look for empty container.
+     * @return the first occurrence of empty GSC in system. If there are no empty GSC in system returns null.
+     */
     private GridServiceContainer findEmptyContainer(){
         GridServiceContainer[] containers = puManager.getContainers();
         for (GridServiceContainer gsc : containers){
