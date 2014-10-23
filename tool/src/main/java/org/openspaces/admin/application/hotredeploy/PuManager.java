@@ -62,6 +62,11 @@ public class PuManager {
         }
     }
 
+    /**
+     * Get processing units by names.
+     * @param names names of required processing units.
+     * @return list of required processing units.
+     */
     public List<ProcessingUnit> identProcessingUnits(List<String> names) {
         List<ProcessingUnit> processingUnits = new ArrayList<ProcessingUnit>();
         for (String name : names) {
@@ -77,16 +82,33 @@ public class PuManager {
         return processingUnits;
     }
 
-    public GridServiceManager[] getMangers(){
+    /**
+     * @return all discovered GSMs in system.
+     */
+    public GridServiceManager[] getMangers() {
         return admin.getGridServiceManagers().getManagers();
     }
 
+    /**
+     * Wait for certain number of managers would been started.
+     *
+     * @param numberOfManagers
+     */
+    public void waitForGSMStart(int numberOfManagers) {
+        admin.getGridServiceManagers().waitFor(numberOfManagers);
+    }
+
+    /**
+     * @return all discovered GSCs in system.
+     */
     public GridServiceContainer[] getContainers() {
         return admin.getGridServiceContainers().getContainers();
     }
 
-
-    public void closeAdmin(){
+    /**
+     * Close admin.
+     */
+    public void closeAdmin() {
         admin.close();
     }
 }
