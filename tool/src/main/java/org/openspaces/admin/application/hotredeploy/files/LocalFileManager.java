@@ -1,8 +1,8 @@
 package org.openspaces.admin.application.hotredeploy.files;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openspaces.admin.application.hotredeploy.config.Config;
-import org.openspaces.admin.application.hotredeploy.utils.FileUtils;
 import org.openspaces.admin.application.hotredeploy.exceptions.HotRedeployException;
 
 import java.io.File;
@@ -30,14 +30,18 @@ public class LocalFileManager implements FileManager {
         for (String puName : puNames) {
             String folderPath = StringUtils.join(new String[]{gigaspacesLocation,"deploy",puName}, File.separator);
             File puFolder = new File(folderPath);
-            FileUtils.deleteDirectory(puFolder);
+            try {
+                FileUtils.deleteDirectory(puFolder);
+            } catch (IOException e) {
+                throw new HotRedeployException(e);
+            }
             String tempFolderPath = StringUtils.join(new String[]{tempDir,"pu",puName}, File.separator);
             File tempPuFolder = new File(tempFolderPath);
 
             String destinationFolderPath = StringUtils.join(new String[]{gigaspacesLocation,"deploy",puName}, File.separator);
             File destinationFolder = new File(destinationFolderPath);
             try {
-                FileUtils.copyFolder(tempPuFolder, destinationFolder);
+                FileUtils.copyDirectory(tempPuFolder, destinationFolder);
             } catch (IOException e) {
                 throw new HotRedeployException(e);
             }
@@ -47,7 +51,11 @@ public class LocalFileManager implements FileManager {
     @Override
     public void removeFolder() {
         File tempDirPu = new File(tempDir + File.separator + "pu");
-        FileUtils.deleteDirectory(tempDirPu);
+        try {
+            FileUtils.deleteDirectory(tempDirPu);
+        } catch (IOException e) {
+            throw new HotRedeployException(e);
+        }
     }
 
     public void createTempFolder(){
@@ -58,7 +66,7 @@ public class LocalFileManager implements FileManager {
             File srcFile = new File(sourcePath);
             File destFile = new File(dest.getAbsolutePath() + File.separator + puName);
             try {
-                FileUtils.copyFolder(srcFile, destFile);
+                FileUtils.copyDirectory(srcFile, destFile);
             } catch (IOException e) {
                 throw new HotRedeployException(e);
             }

@@ -2,6 +2,7 @@ package org.openspaces.admin.application.hotredeploy;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -13,7 +14,6 @@ import org.openspaces.admin.Admin;
 import org.openspaces.admin.AdminException;
 import org.openspaces.admin.AdminFactory;
 import org.openspaces.admin.application.hotredeploy.exceptions.HotRedeployException;
-import org.openspaces.admin.application.hotredeploy.utils.FileUtils;
 import org.openspaces.admin.gsm.GridServiceManagers;
 import org.openspaces.admin.pu.ProcessingUnit;
 import org.openspaces.admin.pu.ProcessingUnitDeployment;
@@ -169,7 +169,11 @@ public class IntegrationTest {
         String[] pathToDeployFolder = {"deploy", "space"};
         File oldFiles = new File(gsLocation + File.separator + StringUtils.join(pathToDeployFolder, File.separator));
         String deployPath = oldFiles.getPath();
-        FileUtils.deleteDirectory(oldFiles);
+        try {
+            FileUtils.deleteDirectory(oldFiles);
+        } catch (IOException e) {
+            throw new HotRedeployException(e);
+        }
         return deployPath;
     }
 
