@@ -1,6 +1,6 @@
 #!/bin/sh
 
-source ./properties.sh
+source properties.properties
 
 if [ "x$GSM_HOSTS" = "x" ]; then
     echo "GSM_HOSTS must be set"
