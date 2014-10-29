@@ -20,9 +20,12 @@ public class HotRedeployMain {
 
     public static void main(String[] args) {
         ConfigInitializer.checkFiles();
+        log.info("check");
         Config config = ConfigInitializer.init(args);
-        LocalFileManager localFileManager = new LocalFileManager(config);
-        localFileManager.createTempFolder();
+        log.info("init");
+        //LocalFileManager localFileManager = new LocalFileManager(config);
+        //localFileManager.createTempFolder();
+        log.info(config.isLocalCluster());
         PuManager puManager = new PuManager(config);
         FileManager fileManager = getFileManager(config);
         puManager.createAdmin();
@@ -45,14 +48,9 @@ public class HotRedeployMain {
 
     }
 
-    // Abstract.. pattern =)))
     private static FileManager getFileManager(Config config) {
         FileManager fileManager;
-
         if(!config.isLocalCluster()) {
-            Console console = System.console();
-            String password = String.valueOf(console.readPassword("%s", "Insert password of remote machine: "));
-            config.setSshPassword(password);
             fileManager = new SSHFileManager(config);
         } else {
             fileManager = new LocalFileManager(config);

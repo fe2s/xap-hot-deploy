@@ -15,10 +15,5 @@
             <destName>XAP-hot-redeploy.sh</destName>
             <outputDirectory>/</outputDirectory>
         </file>
-        <file>
-            <source>src/main/resources/properties.sh</source>
-            <destName>properties.sh</destName>
-            <outputDirectory>/</outputDirectory>
-        </file>
     </files>
 </assembly>

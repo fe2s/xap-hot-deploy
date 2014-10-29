@@ -53,9 +53,10 @@ public class Config {
     @Parameter(names = {"-u", "-user"}, description = "Name of user on remote machine")
     private String sshUser;
 
-    @Parameter(names = {"-lcm","-local_cluster_mode"}, description = "Is local cluster")
-    private Boolean localCluster = false;
+    @Parameter(names = {"-lcm","-local_cluster_mode"}, description = "Is local cluster", arity = 1)
+    private boolean localCluster = false;
 
+    @Parameter(names = {"-p"}, description = "Password of remote machine")
     private String sshPassword;
 
 

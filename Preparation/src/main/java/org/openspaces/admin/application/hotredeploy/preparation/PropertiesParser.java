@@ -1,4 +1,4 @@
-package openspaces.admin.application.hotredeploy;
+package org.openspaces.admin.application.hotredeploy.preparation;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -12,11 +12,11 @@ public class PropertiesParser {
     private Configuration configuration;
 
     public Configuration parse() throws IOException {
-        String rootPath = new File("").getAbsolutePath();
-        System.out.println("ROOT PATH" + rootPath);
-        String[] pathToResources = {rootPath,"tool", "src", "main", "resources", "properties.properties"};
+        String rootPath = new File("").getAbsoluteFile().getParentFile().getParent();
+        System.out.println("PARSER ROOT PATH " + rootPath);
+        String[] pathToResources = {rootPath, "config.properties"};
         String propPath = StringUtils.join(pathToResources, File.separator);
-        System.out.println("PROP PATH" + propPath);
+        System.out.println("PROP PATH " + propPath);
 
         File file = new File(propPath);
         configuration = new Configuration();

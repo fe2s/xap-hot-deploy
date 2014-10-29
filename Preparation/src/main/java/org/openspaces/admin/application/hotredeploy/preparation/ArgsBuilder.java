@@ -1,4 +1,4 @@
-package openspaces.admin.application.hotredeploy;
+package org.openspaces.admin.application.hotredeploy.preparation;
 
 import org.openspaces.admin.application.hotredeploy.exceptions.HotRedeployException;
 
@@ -32,6 +32,10 @@ public class ArgsBuilder {
 
     public String[] build(Configuration configuration){
         List<String> args = new ArrayList<String>();
+        args.add("-u");
+        args.add(configuration.getSshUser());
+        args.add("-p");
+        args.add(configuration.getSshPassword());
         args.add("-put");
         args.add(configuration.getIdentPuTimeout());
         args.add("-smt");

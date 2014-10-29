@@ -13,7 +13,7 @@ http://www.springframework.org/schema/context
           http://www.openspaces.org/schema/remoting http://www.openspaces.org/schema/10.0/remoting/openspaces-remoting.xsd">
 
     <!-- Support @RemotingService component scanning -->
-    <context:component-scan base-package="org.openspaces.admin.application.hotredeploy"/>
+    <context:component-scan base-package="org.org.hotredeploy"/>
 
     <!-- Support the @RemotingService annotation on a service-->
     <os-remoting:annotation-support />
@@ -24,6 +24,6 @@ http://www.springframework.org/schema/context
 
     <os-remoting:service-exporter id="serviceExporter" />
 
-    <bean id="test" class="org.openspaces.admin.application.hotredeploy.InitBean" />
+    <bean id="test" class="org.org.hotredeploy.InitBean" />
 
 </beans>

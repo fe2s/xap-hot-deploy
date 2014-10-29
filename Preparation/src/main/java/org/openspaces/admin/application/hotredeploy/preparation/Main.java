@@ -1,5 +1,7 @@
-package openspaces.admin.application.hotredeploy;
+package org.openspaces.admin.application.hotredeploy.preparation;
 
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.SftpException;
 import org.openspaces.admin.application.hotredeploy.HotRedeployMain;
 
 import java.io.*;
@@ -9,19 +11,16 @@ import java.io.*;
  */
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
-
-
-
         PropertiesParser propertiesParser = new PropertiesParser();
         Configuration configuration = propertiesParser.parse();
         ArgsBuilder argsBuilder = new ArgsBuilder();
         argsBuilder.validateConfig(configuration);
-
-        //TODO change file manager logic to work with jSch (like hot-redeploy.sh script)
-        //TODO add scripts to run preparation module
-        //TODO change comments in properties.properties
-        //FileManager.copy(configuration);
-
+        FileManager fileManager = new FileManager(configuration);
+        try {
+            fileManager.prepareFiles();
+        } catch (JSchException|SftpException e) {
+            e.printStackTrace();
+        }
         String[] arg = argsBuilder.build(configuration);
         HotRedeployMain.main(arg);
     }

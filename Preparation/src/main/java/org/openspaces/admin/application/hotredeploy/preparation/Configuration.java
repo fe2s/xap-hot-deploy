@@ -1,4 +1,4 @@
-package openspaces.admin.application.hotredeploy;
+package org.openspaces.admin.application.hotredeploy.preparation;
 
 import java.util.List;
 import java.util.Map;
@@ -21,6 +21,15 @@ public class Configuration {
     private String isSecured;
     private String doubleRestart;
     private Map<String, String> pus;
+    private String sshPassword;
+
+    public String getSshPassword() {
+        return sshPassword;
+    }
+
+    public void setSshPassword(String sshPassword) {
+        this.sshPassword = sshPassword;
+    }
 
     public String getGsLocation() {
         return gsLocation;
@@ -125,6 +134,7 @@ public class Configuration {
     public void setLocalCluster(String localCluster) {
         this.localCluster = localCluster;
     }
+
 
     @Override
     public String toString() {
