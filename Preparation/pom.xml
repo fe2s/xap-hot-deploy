@@ -60,11 +60,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.0</version>
-        </dependency>
-        <dependency>
             <artifactId>gs-runtime</artifactId>
             <groupId>com.gigaspaces</groupId>
             <version>${gigaspacesVersion}</version>
