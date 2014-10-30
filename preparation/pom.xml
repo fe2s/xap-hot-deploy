@@ -66,11 +66,6 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.openspaces</groupId>
-            <artifactId>XAP-hot-redeploy</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <artifactId>gs-openspaces</artifactId>
             <groupId>com.gigaspaces</groupId>
             <version>${gigaspacesVersion}</version>
