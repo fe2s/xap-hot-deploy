@@ -10,7 +10,7 @@
     </parent>
 
     <version>0.0.1-SNAPSHOT</version>
-    <artifactId>XAP-hot-redeploy</artifactId>
+    <artifactId>tool</artifactId>
 
     <modelVersion>4.0.0</modelVersion>
 
