@@ -49,8 +49,12 @@ Parameters in `properties.sh` file.
 | LOOKUP_GROUP             | optional          | Gigaspace default lookup group       | Lookup group                                                                                                                        |
 | IDENT_PU_TIMEOUT         | required          | "60"                                 | Timeout to identify processing unit (in seconds).                                                                                   |
 | IDENT_SPACE_MODE_TIMEOUT | required          | "60"                                 | Timeout to identify space mode (in seconds).                                                                                        |
+| IDENTIFY_INSTANCES_TIMEOUT | required          | "60"                                 | Timeout to identify instances (in seconds).                                                                                        |
+| RESTART_TIMEOUT | required          | "60"                                 | Timeout for restarting pu (in seconds).                                                                                        |
 | IS_SECURED               | optional          | "false"                              | Set this parameter "true" if space is secured.                                                                                      |
 | DOUBLE_RESTART           | optional          | "false"                              | Set "true" if all instances should be placed in "original" vm after redeploy. When set to "true" primary instances restarted twice. |
+| LOCAL_CLUSTER           | optional          | "false"                              | Set "true" for local cluster mode (testing mode). |
+
 
 Results
 ---
@@ -104,6 +108,15 @@ mvn clean install -DskipTests=false
  * lookup group and locator should be set to default values
  * properties should be set in `/tool/src/test/resources/config.properties` file
  * make sure that there is no pu with name "space" deployed already
+ 
+Rollback
+---
+
+Rollback functionality helps to avoid loosing data, if errors occured during the redeploy (for example - broken pu file).
+When some errors occured tool search for backup GSM. If threre are more than one GSM in system, they will be restarted one by one. If there is only one GSM in system, tool look for empty GSC and restart it. 
+In this cases rollback finished successfuly and all pus for redeploy return to them original version.
+
+If backup GSM and empty container not found rollback faild and system state is unstable.
 
 [gigaspaces wiki]:http://wiki.gigaspaces.com/wiki/display/XAP96/Deploying+onto+the+Service+Grid#DeployingontotheServiceGrid-HotDeploy
 [SSH login without password]:http://www.linuxproblem.org/art_9.html
