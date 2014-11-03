@@ -13,11 +13,10 @@ public class PropertiesParser {
 
     public Configuration parse() throws IOException {
         String rootPath = new File("").getAbsoluteFile().getParentFile().getParent();
-        System.out.println("PARSER ROOT PATH " + rootPath);
+        System.out.println("ROOT PATH " + rootPath);
         String[] pathToResources = {rootPath, "config.properties"};
         String propPath = StringUtils.join(pathToResources, File.separator);
         System.out.println("PROP PATH " + propPath);
-
         File file = new File(propPath);
         configuration = new Configuration();
         InputStream input = new FileInputStream(file.getAbsolutePath());
@@ -48,12 +47,11 @@ public class PropertiesParser {
         String pusString = prop.getProperty("PU");
         List<String> puList = Arrays.asList(pusString.split("\\s*,\\s*"));
         Map<String, String> puMap = new HashMap<String, String>();
-        for(String pu :puList){
+        for (String pu : puList) {
             int index = pu.indexOf('=');
-            String key = pu.substring(0,index).trim();
-            String value = pu.substring(index+1).trim();
-            System.out.println(key + " " + value);
-            puMap.put(key,value);
+            String key = pu.substring(0, index).trim();
+            String value = pu.substring(index + 1).trim();
+            puMap.put(key, value);
         }
         configuration.setPus(puMap);
         input.close();

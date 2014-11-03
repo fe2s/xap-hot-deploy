@@ -24,7 +24,6 @@ public class FileManager {
         String password = String.valueOf(console.readPassword("%s", "Insert password of remote machine: "));
         config.setSshPassword(password);
         rootPath = new File("").getAbsoluteFile().getParentFile().getParent();
-        System.out.println(rootPath);
     }
 
 
@@ -71,7 +70,6 @@ public class FileManager {
         ChannelSftp channel = (ChannelSftp)session.openChannel("sftp");
         channel.connect();
         File localFile = new File(rootPath + File.separator + src);
-        System.out.println(localFile.getAbsolutePath());
             channel.cd(dest);
             channel.put(new FileInputStream(localFile), localFile.getName());
         channel.disconnect();
