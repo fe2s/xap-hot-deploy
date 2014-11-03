@@ -1,6 +1,4 @@
-package org.openspaces.admin.application.hotredeploy;
-
-import org.openspaces.admin.AdminException;
+package org.openspaces.admin.application.hotredeploy.exceptions;
 
 /**
  * @author Anna_Babich

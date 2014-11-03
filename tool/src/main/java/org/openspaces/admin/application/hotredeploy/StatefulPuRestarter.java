@@ -3,6 +3,10 @@ package org.openspaces.admin.application.hotredeploy;
 import com.gigaspaces.cluster.activeelection.SpaceMode;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.openspaces.admin.application.hotredeploy.config.Config;
+import org.openspaces.admin.application.hotredeploy.exceptions.HotRedeployException;
+import org.openspaces.admin.application.hotredeploy.utils.PuUtils;
+import org.openspaces.admin.application.hotredeploy.utils.ScannerHolder;
 import org.openspaces.admin.pu.ProcessingUnit;
 import org.openspaces.admin.pu.ProcessingUnitInstance;
 
@@ -14,25 +18,29 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Anna_Babich
  */
-public class StatefulPuRestarter extends PuRestarter {
+public class StatefulPuRestarter implements PuRestarter {
 
     public static Logger log = LogManager.getLogger(StatefulPuRestarter.class);
     private Config config;
+    private RollbackChecker rollbackChecker;
 
     /**
      * Constructor.
+     *
      * @param config command line args.
      */
-    public StatefulPuRestarter(Config config){
+    public StatefulPuRestarter(Config config, RollbackChecker rollbackChecker) {
         this.config = config;
+        this.rollbackChecker = rollbackChecker;
     }
 
     /**
      * Restart processing unit
+     *
      * @param processingUnit current pu (stateful)
      */
-    public void restart(ProcessingUnit processingUnit){
-        ProcessingUnitInstance[] puInstances = getPuInstances(processingUnit);
+    public boolean restart(ProcessingUnit processingUnit) {
+        ProcessingUnitInstance[] puInstances = PuUtils.getStatefulPuInstances(processingUnit, config);
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -41,13 +49,20 @@ public class StatefulPuRestarter extends PuRestarter {
         int backupsThreads = checkBackups(puInstances);
         int primariesThreads = puInstances.length - backupsThreads;
 
-        ExecutorService backupService = Executors.newFixedThreadPool(backupsThreads);
+        ExecutorService backupService;
+
+        if (backupsThreads == 0) {
+            backupService = Executors.newFixedThreadPool(1);
+        } else {
+            backupService = Executors.newFixedThreadPool(backupsThreads);
+        }
+
         // if return to original state needed, primaries should restart one by one.
         if (config.isDoubleRestart()) {
             primariesThreads = 1;
         }
         ExecutorService primaryService = Executors.newFixedThreadPool(primariesThreads);
-        restartAllInstances(processingUnit, backupService, primaryService);
+        return restartAllInstances(processingUnit, backupService, primaryService);
     }
 
     /**
@@ -64,11 +79,11 @@ public class StatefulPuRestarter extends PuRestarter {
         }
         if (findBackups == 0) {
             System.out.println("No backups find. ALL SPACE DATA WILL BE LOST. Do you want to continue? [y]es, [n]o:");
-            Scanner sc = new Scanner(System.in);
-            String answer = sc.next();
+            Scanner sc = ScannerHolder.getScanner();
+            String answer = sc.nextLine();
             while (!(("y".equals(answer)) || ("n".equals(answer)))) {
                 System.out.println("Error: invalid response [" + answer + "]. Try again.");
-                answer = sc.next();
+                answer = sc.nextLine();
             }
             if ("n".equals(answer)) {
                 String cause = "Hot redeploy was terminated, because no backups find";
@@ -86,16 +101,22 @@ public class StatefulPuRestarter extends PuRestarter {
      * @param backupService  executor service for restart all backups at the same time
      * @param primaryService executor service for restart all primaries at the same time
      */
-    private void restartAllInstances(ProcessingUnit processingUnit, ExecutorService backupService, ExecutorService primaryService) {
+    private boolean restartAllInstances(ProcessingUnit processingUnit, ExecutorService backupService, ExecutorService primaryService) {
         log.info("Restarting pu " + processingUnit.getName() + " with type " + processingUnit.getType());
-        ProcessingUnitInstance [] puInstances = getPuInstances(processingUnit);
+        ProcessingUnitInstance[] puInstances = PuUtils.getStatefulPuInstances(processingUnit, config);
         restartBackups(puInstances, backupService);
-        restartPrimaries(puInstances, primaryService);
-        if (config.isDoubleRestart()) {
-            puInstances = getPuInstances(processingUnit);
-            primaryService = Executors.newFixedThreadPool(1);
+        boolean rollback = rollbackChecker.checkForRollback("Backup restarting fails. If you don't rollback all data will be lost");
+        if (!rollback) {
             restartPrimaries(puInstances, primaryService);
+            rollback = rollbackChecker.checkForRollback("Primary restarting fails. If you don't rollback all data will be lost");
+            if ((!rollback) && (config.isDoubleRestart())){
+                    puInstances = PuUtils.getStatefulPuInstances(processingUnit, config);
+                    primaryService = Executors.newFixedThreadPool(1);
+                    restartPrimaries(puInstances, primaryService);
+                    rollback = rollbackChecker.checkForRollback("Primary restarting fails. If you don't rollback all data will be lost");
+            }
         }
+        return rollback;
     }
 
     /**
@@ -108,7 +129,7 @@ public class StatefulPuRestarter extends PuRestarter {
         for (ProcessingUnitInstance puInstance : puInstances) {
 
             if (puInstance.getSpaceInstance().getMode() == SpaceMode.BACKUP) {
-                backupService.submit(new PuInstanceRestarter(puInstance));
+                backupService.submit(new PuInstanceRestarter(puInstance, config.getRestartTimeout()));
             }
         }
         shutDownAndWait(backupService);
@@ -123,7 +144,7 @@ public class StatefulPuRestarter extends PuRestarter {
     private void restartPrimaries(ProcessingUnitInstance[] puInstances, ExecutorService primaryService) {
         for (ProcessingUnitInstance puInstance : puInstances) {
             if (puInstance.getSpaceInstance().getMode() == SpaceMode.PRIMARY) {
-                primaryService.submit(new PuInstanceRestarter(puInstance));
+                primaryService.submit(new PuInstanceRestarter(puInstance, config.getRestartTimeout()));
             }
         }
         shutDownAndWait(primaryService);
@@ -138,44 +159,10 @@ public class StatefulPuRestarter extends PuRestarter {
         service.shutdown();
         try {
             while (!service.awaitTermination(10, TimeUnit.MINUTES)) {
+                Thread.sleep(100);
             }
         } catch (InterruptedException e) {
             log.error(e);
-        }
-    }
-
-    /**
-     * Identify pu instances and wait for identify space mode of each instances.
-     * @return discovered pu instances
-     */
-    public ProcessingUnitInstance[] getPuInstances(ProcessingUnit processingUnit){
-        ProcessingUnitInstance[] puInstances = identifyPuInstances(processingUnit);
-        identSpaceMode(puInstances);
-        return puInstances;
-    }
-
-    /**
-     * Discover space mode for all pu instances.
-     *
-     * @param puInstances discovered processing unit instances.
-     */
-    private void identSpaceMode(ProcessingUnitInstance[] puInstances) {
-        Long timeout = System.currentTimeMillis() + config.getIdentifySpaceModeTimeout() * 1000;
-        boolean keepTrying = true;
-
-        while (keepTrying) {
-            if (System.currentTimeMillis() >= timeout) {
-                String cause = "can't identify space mode";
-                log.error(cause);
-                log.error(HotRedeployMain.FAILURE);
-                throw new HotRedeployException(cause);
-            }
-            keepTrying = false;
-            for (ProcessingUnitInstance instance : puInstances) {
-                if ((instance.getSpaceInstance() == null) || (instance.getSpaceInstance().getMode() == SpaceMode.NONE)) {
-                    keepTrying = true;
-                }
-            }
         }
     }
 }

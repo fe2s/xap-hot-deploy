@@ -8,4 +8,9 @@
 # Maven
 log/
 target/
-hot-redeploy.log
+.metadata
+.settings
+.classpath
+.class
+bin/
+logs/

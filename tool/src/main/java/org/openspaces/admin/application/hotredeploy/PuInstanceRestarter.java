@@ -12,9 +12,11 @@ public class PuInstanceRestarter implements Runnable {
     public static Logger log = LogManager.getLogger(PuInstanceRestarter.class);
 
     private ProcessingUnitInstance instance;
+    private Long timeout;
 
-    public PuInstanceRestarter(ProcessingUnitInstance instance){
+    public PuInstanceRestarter(ProcessingUnitInstance instance, Long restartTimeout){
         this.instance = instance;
+        timeout = restartTimeout;
     }
 
     @Override
@@ -35,7 +37,7 @@ public class PuInstanceRestarter implements Runnable {
                 + pi.getVirtualMachine().getDetails().getPid() + " mode:"
                 + instStr + "...");
 
-        pi.restartAndWait();
+        pi.restartAndWait(timeout, TimeUnit.SECONDS);
         log.info("done");
     }
 }
