@@ -56,31 +56,29 @@ Results
 ---
 In case if there are no problems with hot-redeploy application you can see success message and details for restarting pu instances: 
 ```sh
-12:06:08,089  INFO main ConfigInitializer:init:25 - Pu to restart: [space, cinema, mirror]
-12:06:08,092  INFO main ConfigInitializer:init:26 - Locator: null
-12:06:08,095  INFO main ConfigInitializer:init:27 - Lookup group: null
-12:06:08,095  INFO main ConfigInitializer:init:28 - Timeout for identify pu: 100
-12:06:08,095  INFO main ConfigInitializer:init:29 - Timeout for identify space mode: 100
-12:06:08,095  INFO main ConfigInitializer:init:30 - Secured: false
-12:06:08,095  INFO main ConfigInitializer:init:31 - Double restart: true
-12:06:13,708  INFO main StatefulPuRestarter:restartAllInstances:90 - Restarting pu space with type STATEFUL
-12:06:13,710  INFO pool-6-thread-1 PuInstanceRestarter:restartPUInstance:32 - restarting instance 1 on 127.0.0.1[127.0.0.1] GSC PID:7260 mode:backup...
-12:06:13,710  INFO pool-6-thread-2 PuInstanceRestarter:restartPUInstance:32 - restarting instance 2 on 127.0.0.1[127.0.0.1] GSC PID:11464 mode:backup...
-12:06:26,546  INFO pool-6-thread-1 PuInstanceRestarter:restartPUInstance:39 - done
-12:06:28,906  INFO pool-6-thread-2 PuInstanceRestarter:restartPUInstance:39 - done
-12:06:28,970  INFO pool-7-thread-1 PuInstanceRestarter:restartPUInstance:32 - restarting instance 2 on 127.0.0.1[127.0.0.1] GSC PID:7260 mode:primary...
-12:06:40,881  INFO pool-7-thread-1 PuInstanceRestarter:restartPUInstance:39 - done
-12:06:40,881  INFO pool-7-thread-1 PuInstanceRestarter:restartPUInstance:32 - restarting instance 1 on 127.0.0.1[127.0.0.1] GSC PID:11464 mode:primary...
-12:06:51,631  INFO pool-7-thread-1 PuInstanceRestarter:restartPUInstance:39 - done
-12:06:52,644  INFO pool-8-thread-1 PuInstanceRestarter:restartPUInstance:32 - restarting instance 1 on 127.0.0.1[127.0.0.1] GSC PID:7260 mode:primary...
-12:07:05,719  INFO pool-8-thread-1 PuInstanceRestarter:restartPUInstance:39 - done
-12:07:05,719  INFO pool-8-thread-1 PuInstanceRestarter:restartPUInstance:32 - restarting instance 2 on 127.0.0.1[127.0.0.1] GSC PID:11464 mode:primary...
-12:07:16,390  INFO pool-8-thread-1 PuInstanceRestarter:restartPUInstance:39 - done
-12:07:17,433  INFO main StatelessPuRestarter:restart:23 - Restarting pu cinema with type WEB
-12:07:26,107  INFO main StatelessPuRestarter:restart:25 - done
-12:07:27,116  INFO main StatelessPuRestarter:restart:23 - Restarting pu mirror with type MIRROR
-12:07:33,929  INFO main StatelessPuRestarter:restart:25 - done
-12:07:33,945  INFO main HotRedeployMain:main:17 - Hot redeploy completed successfully
+14:51:44,392  INFO main ConfigInitializer:init:28 - Gigaspaces location: /home/user/gigaspaces-xap-premium-10.0.0-ga
+14:51:44,393  INFO main ConfigInitializer:init:29 - Pu to restart: [space, cinema, mirror]
+14:51:44,393  INFO main ConfigInitializer:init:30 - Locator: null
+14:51:44,393  INFO main ConfigInitializer:init:31 - Lookup group: null
+14:51:44,394  INFO main ConfigInitializer:init:32 - Timeout for identify pu: 60
+14:51:44,394  INFO main ConfigInitializer:init:33 - Timeout for identify instances: 60
+14:51:44,394  INFO main ConfigInitializer:init:34 - Timeout for identify space mode: 60
+14:51:44,395  INFO main ConfigInitializer:init:35 - Timeout for restart 60
+14:51:44,395  INFO main ConfigInitializer:init:36 - Secured: false
+14:51:44,395  INFO main ConfigInitializer:init:37 - Double restart: false
+14:51:44,395  INFO main ConfigInitializer:init:38 - GSM Hosts: [127.0.0.1]
+14:51:44,395  INFO main ConfigInitializer:init:39 - User: user
+14:51:44,395  INFO main ConfigInitializer:init:40 - Is local cluster: false
+14:51:52,044  INFO main StatefulPuRestarter:restartAllInstances:105 - Restarting pu space with type STATEFUL
+14:51:52,045  INFO pool-6-thread-1 PuInstanceRestarter:restartPUInstance:36 - restarting instance 1 on 127.0.0.1[127.0.0.1] GSC PID:9214 mode:backup...
+14:52:05,085  INFO pool-6-thread-1 PuInstanceRestarter:restartPUInstance:43 - done
+14:52:06,233  INFO pool-7-thread-1 PuInstanceRestarter:restartPUInstance:36 - restarting instance 1 on 127.0.0.1[127.0.0.1] GSC PID:9213 mode:primary...
+14:52:21,367  INFO pool-7-thread-1 PuInstanceRestarter:restartPUInstance:43 - done
+14:52:22,433  INFO main StatelessPuRestarter:restart:23 - Restarting pu cinema with type WEB
+14:52:31,107  INFO main StatelessPuRestarter:restart:25 - done
+14:52:32,116  INFO main StatelessPuRestarter:restart:23 - Restarting pu mirror with type MIRROR
+14:52:38,929  INFO main StatelessPuRestarter:restart:25 - done
+14:52:28,945  INFO main HotRedeployMain:main:17 - Hot redeploy completed successfully
 ```
 
 If there are any problems during the hot-redeploy, you will see an error message and description of the problem:
