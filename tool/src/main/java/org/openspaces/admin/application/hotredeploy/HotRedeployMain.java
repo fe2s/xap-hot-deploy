@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.openspaces.admin.application.hotredeploy.config.Config;
 import org.openspaces.admin.application.hotredeploy.config.ConfigInitializer;
 import org.openspaces.admin.application.hotredeploy.files.FileManager;
+import org.openspaces.admin.application.hotredeploy.files.FileManagerFactory;
 import org.openspaces.admin.application.hotredeploy.files.LocalFileManager;
 import org.openspaces.admin.application.hotredeploy.files.SSHFileManager;
 import org.openspaces.admin.application.hotredeploy.utils.PuUtils;
@@ -20,14 +21,10 @@ public class HotRedeployMain {
 
     public static void main(String[] args) {
         ConfigInitializer.checkFiles();
-        log.info("check");
         Config config = ConfigInitializer.init(args);
-        log.info("init");
-        //LocalFileManager localFileManager = new LocalFileManager(config);
-        //localFileManager.createTempFolder();
         log.info(config.isLocalCluster());
         PuManager puManager = new PuManager(config);
-        FileManager fileManager = getFileManager(config);
+        FileManager fileManager = FileManagerFactory.getFileManager(config);
         puManager.createAdmin();
         try {
             redeploy(puManager, config, fileManager);
@@ -48,14 +45,6 @@ public class HotRedeployMain {
 
     }
 
-    private static FileManager getFileManager(Config config) {
-        FileManager fileManager;
-        if(!config.isLocalCluster()) {
-            fileManager = new SSHFileManager(config);
-        } else {
-            fileManager = new LocalFileManager(config);
-        }
-        return fileManager;
-    }
+
 
 }

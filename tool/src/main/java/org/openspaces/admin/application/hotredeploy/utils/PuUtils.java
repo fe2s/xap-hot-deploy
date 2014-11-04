@@ -29,8 +29,6 @@ public class PuUtils {
     public static void identSpaceMode(ProcessingUnitInstance[] puInstances, Config config) {
         Long timeout = System.currentTimeMillis() + config.getIdentifySpaceModeTimeout() * 1000;
         boolean keepTrying = true;
-
-        //let's try to refactor it together =)))
         while (keepTrying) {
             if (System.currentTimeMillis() >= timeout) {
                 String cause = "can't identify space mode";

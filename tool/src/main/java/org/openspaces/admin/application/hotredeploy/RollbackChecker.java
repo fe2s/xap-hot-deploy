@@ -27,12 +27,12 @@ public class RollbackChecker {
 
     private Config config;
     private PuManager puManager;
-    private FileManager sshFileManager;
+    private FileManager fileManager;
 
-    public RollbackChecker(Config config, PuManager puManager, FileManager sshFileManager) {
+    public RollbackChecker(Config config, PuManager puManager, FileManager fileManager) {
         this.config = config;
         this.puManager = puManager;
-        this.sshFileManager = sshFileManager;
+        this.fileManager = fileManager;
     }
 
     /**
@@ -96,7 +96,7 @@ public class RollbackChecker {
      * @param config config tool information.
      */
     private void doRollback(Config config) {
-        sshFileManager.restoreTempFolders();
+        fileManager.restoreTempFolders();
         log.info("Do rollback..");
         GridServiceManager[] managers = puManager.getMangers();
         if (managers.length > 1) {
