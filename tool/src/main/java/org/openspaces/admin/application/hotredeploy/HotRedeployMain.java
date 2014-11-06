@@ -3,14 +3,11 @@ package org.openspaces.admin.application.hotredeploy;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.openspaces.admin.application.hotredeploy.config.Config;
-import org.openspaces.admin.application.hotredeploy.config.ConfigInitializer;
+import org.openspaces.admin.application.hotredeploy.config.PropertyParser;
+import org.openspaces.admin.application.hotredeploy.config.Validation;
 import org.openspaces.admin.application.hotredeploy.files.FileManager;
 import org.openspaces.admin.application.hotredeploy.files.FileManagerFactory;
-import org.openspaces.admin.application.hotredeploy.files.LocalFileManager;
-import org.openspaces.admin.application.hotredeploy.files.SSHFileManager;
 import org.openspaces.admin.application.hotredeploy.utils.PuUtils;
-
-import java.io.Console;
 
 public class HotRedeployMain {
 
@@ -20,16 +17,16 @@ public class HotRedeployMain {
     public static Logger log = LogManager.getLogger(HotRedeployMain.class);
 
     public static void main(String[] args) {
-        ConfigInitializer.checkFiles();
-        Config config = ConfigInitializer.init(args);
-        log.info(config.isLocalCluster());
-        PuManager puManager = new PuManager(config);
+        Config config = PropertyParser.parse();
+        Validation.validate(config);
         FileManager fileManager = FileManagerFactory.getFileManager(config);
+        fileManager.prepareFiles();
+        PuManager puManager = new PuManager(config);
         puManager.createAdmin();
         try {
             redeploy(puManager, config, fileManager);
         } finally {
-            fileManager.removeFolder();
+            fileManager.removeTempFolder();
             puManager.closeAdmin();
         }
     }
@@ -44,7 +41,4 @@ public class HotRedeployMain {
         }
 
     }
-
-
-
 }

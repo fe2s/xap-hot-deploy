@@ -7,5 +7,7 @@ public interface FileManager {
 
     void restoreTempFolders();
 
-    void removeFolder();
+    void removeTempFolder();
+
+    public void prepareFiles();
 }

@@ -69,7 +69,7 @@ public class PuUtils {
      * Restart all discovered pus.
      */
     public static boolean restartAllPUs(PuManager puManager, Config config, RollbackChecker rollbackChecker) {
-        return restartPUs(puManager, config.getPuToRestart(), config, rollbackChecker);
+        return restartPUs(puManager, config.getPuNames(), config, rollbackChecker);
     }
 
     public static boolean restartPUs(PuManager puManager, List<String> puNames, Config config, RollbackChecker rollbackChecker){

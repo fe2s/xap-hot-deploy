@@ -60,7 +60,7 @@ public class RollbackChecker {
      * Check system for errors.
      */
     private void checkForErrors() {
-        List<ProcessingUnit> processingUnits = puManager.identProcessingUnits(config.getPuToRestart());
+        List<ProcessingUnit> processingUnits = puManager.identProcessingUnits(config.getPuNames());
         for (ProcessingUnit processingUnit : processingUnits) {
             processingUnit.waitFor(processingUnit.getPlannedNumberOfInstances(), config.getIdentifyInstancesTimeout(), TimeUnit.SECONDS);
             ProcessingUnitInstance[] instances = processingUnit.getInstances();
@@ -112,7 +112,7 @@ public class RollbackChecker {
                 throw new HotRedeployException("There is no empty GSC in system. If you want to rollback please start new GSC manually");
             }
         }
-        List<ProcessingUnit> processingUnits = puManager.identProcessingUnits(config.getPuToRestart());
+        List<ProcessingUnit> processingUnits = puManager.identProcessingUnits(config.getPuNames());
         for (ProcessingUnit processingUnit : processingUnits) {
             processingUnit.waitFor(processingUnit.getPlannedNumberOfInstances(), config.getRestartTimeout(), TimeUnit.SECONDS);
         }

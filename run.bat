@@ -1,3 +1,3 @@
-cd preparation\target
-java -classpath  preparation-0.0.1-SNAPSHOT-jar-with-dependencies.jar org.openspaces.admin.application.hotredeploy.preparation.Main
+cd tool\target
+java -classpath  tool-0.0.1-SNAPSHOT-jar-with-dependencies.jar org.openspaces.admin.application.hotredeploy.HotRedeployMain
 pause

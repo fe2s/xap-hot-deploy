@@ -1,11 +1,12 @@
 package org.openspaces.admin.application.hotredeploy.config;
 
-import com.beust.jcommander.Parameter;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Anna_Babich
@@ -13,50 +14,78 @@ import java.util.List;
 public class Config {
     public static Logger log = LogManager.getLogger(Config.class);
 
-
-    @Parameter(names = {"-gsloc", "-gs_location"}, description = "Path to gigaspaces folder")
+    /**
+     * Path to gigaspaces folder.
+     */
     private String gigaspacesLocation;
 
-    @Parameter
-    private List<String> parameters = new ArrayList<String>();
+    /**
+     * Name and fileNames of restarting pus.
+     */
+    private Map<String, String> pusToRestart = new HashMap<String, String>();
 
-    @Parameter(names = {"-pun", "-pu_name"}, description = "Name of restarting processing unit")
-    private List<String> puToRestart = new ArrayList<String>();
+    /**
+     * Pu to restart names.
+     */
+    private List<String> puNames = new ArrayList<>();
 
-    @Parameter(names = {"-gsl", "-gs_locator"}, description = "Locator")
+    /**
+     * Locator.
+     */
     private String locator = null;
 
-    @Parameter(names = {"-gsg", "-gs_group"}, description = "Lookup group")
+    /**
+     * Lookup group.
+     */
     private String lookupGroup = null;
+    /**
+     * Timeout for identify pu.
+     */
+    private Long identifyPuTimeout = null;
 
-    @Parameter(names = {"-put", "-pu_timeout"}, description = "Timeout for identify pu")
-    private Long identifyPuTimeout;
+    /**
+     * Timeout for identify instances.
+     */
+    private Long identifyInstancesTimeout = null;
 
-    @Parameter(names = {"-inst", "-instances_timeout"}, description = "Timeout for identify instances")
-    private Long identifyInstancesTimeout;
+    /**
+     * Timeout for identify space mode.
+     */
+    private Long identifySpaceModeTimeout = null;
 
-    @Parameter(names = {"-smt", "-space_made_timeout"}, description = "Timeout for identify space mode")
-    private Long identifySpaceModeTimeout;
+    /**
+     * Timeout for restarting pu.
+     */
+    private Long restartTimeout = null;
 
-    @Parameter(names = {"-rt", "-restart_timeout"}, description = "Timeout for restarting pu")
-    private long restartTimeout;
-
-    @Parameter(names = {"-s", "-secured"}, description = "Identify security", arity = 1)
+    /**
+     * Identify security.
+     */
     private boolean isSecured = false;
 
-    @Parameter(names = {"-dr", "-double_restart"}, description = "Is double restart required", arity = 1)
+    /**
+     * Is double restart required.
+     */
     private boolean doubleRestart = false;
 
-    @Parameter(names = {"-gsmh", "-gsm_hosts"}, description = "Hosts on which GSM are located")
+    /**
+     * Hosts on which GSM are located.
+     */
     private List<String> gsmHosts = new ArrayList<String>();
 
-    @Parameter(names = {"-u", "-user"}, description = "Name of user on remote machine")
+    /**
+     * Name of user on remote machine.
+     */
     private String sshUser;
 
-    @Parameter(names = {"-lcm","-local_cluster_mode"}, description = "Is local cluster", arity = 1)
+    /**
+     * Is local cluster.
+     */
     private boolean localCluster = false;
 
-    @Parameter(names = {"-p"}, description = "Password of remote machine")
+    /**
+     * Password of remote machine.
+     */
     private String sshPassword;
 
 
@@ -66,14 +95,6 @@ public class Config {
 
     public void setGigaspacesLocation(String gigaspacesLocation) {
         this.gigaspacesLocation = gigaspacesLocation;
-    }
-
-    public List<String> getPuToRestart() {
-        return puToRestart;
-    }
-
-    public void setPuToRestart(List<String> puToRestart) {
-        this.puToRestart = puToRestart;
     }
 
     public String getLocator() {
@@ -116,11 +137,11 @@ public class Config {
         this.identifySpaceModeTimeout = identifySpaceModeTimeout;
     }
 
-    public long getRestartTimeout() {
+    public Long getRestartTimeout() {
         return restartTimeout;
     }
 
-    public void setRestartTimeout(long restartTimeout) {
+    public void setRestartTimeout(Long restartTimeout) {
         this.restartTimeout = restartTimeout;
     }
 
@@ -164,11 +185,27 @@ public class Config {
         this.sshPassword = sshPassword;
     }
 
-    public Boolean isLocalCluster() {
+    public Map<String, String> getPusToRestart() {
+        return pusToRestart;
+    }
+
+    public void setPusToRestart(Map<String, String> pusToRestart) {
+        this.pusToRestart = pusToRestart;
+    }
+
+    public void setLocalCluster(boolean localCluster) {
+        this.localCluster = localCluster;
+    }
+
+    public boolean isLocalCluster() {
         return localCluster;
     }
 
-    public void setLocalCluster(Boolean localCluster) {
-        this.localCluster = localCluster;
+    public List<String> getPuNames() {
+        return puNames;
+    }
+
+    public void setPuNames(List<String> puNames) {
+        this.puNames = puNames;
     }
 }
