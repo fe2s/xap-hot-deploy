@@ -4,6 +4,8 @@ import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.openspaces.admin.application.hotredeploy.config.Config;
 import org.openspaces.admin.application.hotredeploy.exceptions.HotRedeployException;
 
@@ -15,6 +17,8 @@ import java.util.Map;
  * @author Mykola_Zalyayev
  */
 public class LocalFileManager implements FileManager {
+
+    public static Logger log = LogManager.getLogger(LocalFileManager.class);
 
     private String tempDir;
     private String gsLocation;
@@ -64,18 +68,17 @@ public class LocalFileManager implements FileManager {
 
     @Override
     public void prepareFiles() {
-        //TODO logs
         createTempFolder();
         for (String puName : pus.keySet()) {
             try {
                 File src = new File(gsLocation + File.separator + "deploy" + File.separator + puName);
-                System.out.println("src " + src.getAbsolutePath());
+                log.info("Old files " + src.getAbsolutePath());
                 String deployPath = src.getParent();
-                System.out.println("deploy path" + deployPath);
+                log.info("Deploy path " + deployPath);
                 File temp = new File(tempDir + "pu");
-                System.out.println("temp " + temp.getAbsolutePath());
+                log.info("Temp dir " + temp.getAbsolutePath());
                 File newFile = new File(rootPath + File.separator + pus.get(puName));
-                System.out.println("newFile" + newFile.getAbsolutePath());
+                log.info("New file " + newFile.getAbsolutePath());
                 FileUtils.copyDirectoryToDirectory(src, temp);
                 FileUtils.deleteDirectory(src);
                 ZipFile zipFile = new ZipFile(newFile);
