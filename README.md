@@ -8,11 +8,11 @@ See [gigaspaces wiki] for details.
 
 Tool will restart all processing units defined by user.
 
-New files will be copied to the deploy folder. After that application will define all processing units and restart them.
+New files will be copied to the deploy folder. After that application will discover all processing units and restart them.
 
 Stateful PU restart.
 ---
-1. Tool defines all processing unit instances and identifies their space mode.
+1. Tool discover all processing unit instances and identifies their space mode.
 2. All backups restarted
 3. All primaries restarted. If 'double_restart' option enabled, primaries restarted twice to return to the original state.
 
@@ -39,10 +39,10 @@ Parameters in `config.properties` file.
 |--------------------------|-------------------|--------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
 | GSM_HOSTS                | required          | -                                    | Hosts on which GSM are located.                                                                                                     |
 | PU                       | required          | space=space.jar, web=web.war | Map with key value pairs, where key is processing unit name, value is name of file with new classes.                                |
-| SSS_USER                 | required          | user                              | Name of user on remote machine.                                                                                                     |
-| GIGASPACES_LOCATION      | required          | -                                    | Path to gigaspaces directory.                                                                                                       |
-| GIGASPACES_LOCATORS      | optional          | localhost                            | Gigaspaces locator.                                                                                                                 |
-| LOOKUP_GROUP             | optional          | Gigaspace default lookup group       | Lookup group                                                                                                                        |
+| SSH_USER                 | required          | user                              | Name of user on remote machine.                                                                                                     |
+| GS_HOME_DIR      | required          | -                                    | Path to gigaspaces directory.                                                                                                       |
+| LOOKUPLOCATORS      | optional          | localhost                            | Gigaspaces locator.                                                                                                                 |
+| LOOKUPGROUPS             | optional          | Gigaspace default lookup group       | Lookup group                                                                                                                        |
 | IDENT_PU_TIMEOUT         | required          | 60                                | Timeout to identify processing unit (in seconds).                                                                                   |
 | IDENT_SPACE_MODE_TIMEOUT | required          | 60                                 | Timeout to identify space mode (in seconds).                                                                                        |
 | IDENTIFY_INSTANCES_TIMEOUT | required          | 60                                 | Timeout to identify instances (in seconds).                                                                                        |

@@ -41,12 +41,12 @@ public class PropertyParser {
     private static void setProperties(InputStream input) throws IOException {
         Properties prop = new Properties();
         prop.load(input);
-        configuration.setGigaspacesLocation(prop.getProperty("GIGASPACES_LOCATION"));
-        String locator = prop.getProperty("GIGASPACES_LOCATORS");
+        configuration.setGigaspacesLocation(prop.getProperty("GS_HOME_DIR"));
+        String locator = prop.getProperty("LOOKUPLOCATORS");
         if (!"".equals(locator)) {
             configuration.setLocator(prop.getProperty(locator));
         }
-        String group = prop.getProperty("LOOKUP_GROUP");
+        String group = prop.getProperty("LOOKUPGROUPS");
         if (!"".equals(group)) {
             configuration.setLookupGroup(group);
         }
