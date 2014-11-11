@@ -8,19 +8,30 @@ See [gigaspaces wiki] for details.
 
 Tool will restart all processing units defined by user.
 
-New files will be copied to the deploy folder. After that application will discover all processing units and restart them.
+Old deployment files for specified pu will be moved to the temp folder. 
+New files will be copied to the gigaspaces xap deploy folder. 
+After that application will discover all processing units and restart them.
 
 Stateful PU restart.
 ---
 1. Tool discover all processing unit instances and identifies their space mode.
-2. All backups restarted
-3. All primaries restarted. If 'double_restart' option enabled, primaries restarted twice to return to the original state.
+2. All backups restarted (each instance in separate thread).
+3. All primaries restarted. If 'double_restart' option enabled, primaries restarted twice to return to the original state (one by one).
+In the other case primaries restarted on time (each instance in separate thread).
+Use 'double_restart' if it is important what the instance on which machine should be located.
+
+Stateless PU restart.
+---
+1. Tool discover all processing unit instances and restart them (each instance in separate thread).
 
 Build
 ---
+
+Source files ('xap-hot-redeploy' folder) can located anywhere on your machine.  
+
 For build use:
 
-    mvn clean install 
+    ``mvn clean install``
     
 Note, that tests will be skipped in this case. How to build with tests see in Tests section.
 
@@ -28,9 +39,9 @@ Note, that tests will be skipped in this case. How to build with tests see in Te
 Run
 ---
 
-1. Copy jar(war) file with new classes to the `xap-hot-redeploy` folder.
-2. Configure options in `config.properties` file.
-3. Run `run.sh (run.bat)` script.
+1. Copy new jar(war) files with new classes to the `xap-hot-redeploy` folder.
+2. Configure options in `xap-hot-redeploy/config.properties` file.
+3. Run `run.sh (run.bat)` script from xap-hot-redeploy folder.
 
 Parameters in `config.properties` file.
 ---
@@ -46,7 +57,7 @@ Parameters in `config.properties` file.
 | IDENT_PU_TIMEOUT         | required          | 60                                | Timeout to identify processing unit (in seconds).                                                                                   |
 | IDENT_SPACE_MODE_TIMEOUT | required          | 60                                 | Timeout to identify space mode (in seconds).                                                                                        |
 | IDENTIFY_INSTANCES_TIMEOUT | required          | 60                                 | Timeout to identify instances (in seconds).                                                                                        |
-| RESTART_TIMEOUT | required          | 60                                 | Timeout for restarting pu (in seconds).                                                                                        |
+| RESTART_TIMEOUT | required          | 60                                 | Timeout for restarting pu (in seconds). Please pay attention that this time should be enough to restart the instance!                                                                               |
 | IS_SECURED               | optional          | false                              | Set this parameter "true" if space is secured.                                                                                      |
 | DOUBLE_RESTART           | optional          | false                              | Set "true" if all instances should be placed in "original" vm after redeploy. When set to "true" primary instances restarted twice. |
 | LOCAL_CLUSTER           | optional          | false                              | Set "true" for local cluster mode (testing mode). |
@@ -93,6 +104,7 @@ Tests
 ---
 
 If you want to build tool with running tests use 
+
 ```
 mvn clean install -DskipTests=false
 ```
@@ -106,11 +118,32 @@ mvn clean install -DskipTests=false
 Rollback
 ---
 
-Rollback functionality helps to avoid loosing data, if errors occured during the redeploy (for example - broken pu file).
-When some errors occured tool search for backup GSM. If threre are more than one GSM in system, they will be restarted one by one. If there is only one GSM in system, tool look for empty GSC and restart it. 
-In this cases rollback finished successfuly and all pus for redeploy return to them original version.
+Rollback functionality helps to avoid loosing data, if errors occurred during the redeploy (for example - broken pu file).
+When some errors occurred tool search for backup GSM. If there are more than one GSM in system, they will be restarted one by one. If there is only one GSM in system, tool look for empty GSC and restart it. 
+In this cases rollback finished successfully and all pus for redeploy return to them original version.
 
-If backup GSM and empty container not found rollback faild and system state is unstable.
+If backup GSM and empty container not found rollback failed and system state is unstable.
+
+Rollback working example:
+
+```
+17:03:48,679  INFO main StatefulPuRestarter:restartAllInstances:105 - Restarting pu space with type STATEFUL
+17:03:48,681  INFO pool-6-thread-1 PuInstanceRestarter:restartPUInstance:36 - restarting instance 1 on 127.0.0.1[127.0.0.1] GSC PID:7612 mode:backup...
+17:04:49,294  INFO pool-6-thread-1 PuInstanceRestarter:restartPUInstance:43 - done
+17:10:35,739  INFO main RollbackChecker:doRollback:100 - Do rollback..
+17:10:35,739  INFO main RollbackChecker:doRollback:106 - There is one GSM in system. Try to find empty GSC
+17:10:35,740  INFO main RollbackChecker:doRollback:109 - Restarting GSC with id 2
+17:10:53,683  INFO main RollbackChecker:doRollback:119 - Rollback completed successfully
+17:10:53,684  WARN main HotRedeployMain:redeploy:44 - Hot redeploy failed. Rollback successfully completed
+```
+
+>Minimal configuration for rollback working:
+
+* At least one backup GSM in system.
+
+or
+
+* If n = count of primary pu instances, you should have n + 1 GSC in system.
 
 [gigaspaces wiki]:http://wiki.gigaspaces.com/wiki/display/XAP96/Deploying+onto+the+Service+Grid#DeployingontotheServiceGrid-HotDeploy
 [SSH login without password]:http://www.linuxproblem.org/art_9.html
