@@ -27,7 +27,7 @@ Stateless PU restart.
 Build
 ---
 
-Source files ('xap-hot-redeploy' folder) can located anywhere on your machine.  
+Source files ('xap-hot-redeploy' folder) can be located anywhere on your machine.  
 
 For build use:
 
@@ -65,7 +65,7 @@ Parameters in `config.properties` file.
 
 Results
 ---
-In case if there are no problems with hot-redeploy application you can see success message and details for restarting pu instances: 
+In case if there are no problems with hot-redeploy application you can see success message and details about restarting pu instances: 
 ```sh
 14:51:44,392  INFO main ConfigInitializer:init:28 - Gigaspaces location: /home/user/gigaspaces-xap-premium-10.0.0-ga
 14:51:44,393  INFO main ConfigInitializer:init:29 - Pu to restart: [space, cinema, mirror]
@@ -92,7 +92,7 @@ In case if there are no problems with hot-redeploy application you can see succe
 14:52:28,945  INFO main HotRedeployMain:main:17 - Hot redeploy completed successfully
 ```
 
-If there are any problems during the hot-redeploy, you will see an error message and description of the problem:
+If there are any problems during the hot-redeploy, you will see an error message and issue description:
 ```sh
 20:11:27,861  INFO main HotRedeployMain:checkFiles:76 - Please place new files on all GSM machines and try again.
 20:11:27,864  INFO main HotRedeployMain:checkFiles:77 - Hot redeploy failed
