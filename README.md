@@ -31,7 +31,7 @@ Source files ('xap-hot-redeploy' folder) can located anywhere on your machine.
 
 For build use:
 
-    `mvn clean install`
+``mvn clean install``
     
 Note, that tests will be skipped in this case. How to build with tests see in Tests section.
 
