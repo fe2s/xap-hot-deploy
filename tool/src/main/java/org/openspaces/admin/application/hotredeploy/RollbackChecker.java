@@ -78,20 +78,6 @@ public class RollbackChecker {
         }
     }
 
-    private static void waitForPuDeployed(GridServiceManager gsm, String puName) throws InterruptedException {
-        // ElasticStatefulProcessingUnitDeployment.addDependency() doesn't work. This is a workaround
-        ProcessingUnits pus = gsm.getAdmin().getProcessingUnits();
-        ProcessingUnit pu;
-        int sleepInterval = 1000;
-        System.out.print(String.format("Waiting for PU [%s] ", puName));
-        while ((pu = pus.getProcessingUnit(puName)) == null || pu.getStatus() != DeploymentStatus.INTACT) {
-            Thread.sleep(sleepInterval);
-            System.out.print(".");
-        }
-        System.out.println(" DONE");
-    }
-
-
     /**
      * When some errors occurred, check with user if rollback needed.
      */
