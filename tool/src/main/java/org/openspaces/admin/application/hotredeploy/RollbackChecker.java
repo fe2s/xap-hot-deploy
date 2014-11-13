@@ -9,9 +9,7 @@ import org.openspaces.admin.application.hotredeploy.utils.PuUtils;
 import org.openspaces.admin.application.hotredeploy.utils.ScannerHolder;
 import org.openspaces.admin.gsc.GridServiceContainer;
 import org.openspaces.admin.gsm.GridServiceManager;
-import org.openspaces.admin.pu.ProcessingUnit;
-import org.openspaces.admin.pu.ProcessingUnitInstance;
-import org.openspaces.admin.pu.ProcessingUnitType;
+import org.openspaces.admin.pu.*;
 
 import java.util.List;
 import java.util.Scanner;
@@ -37,16 +35,17 @@ public class RollbackChecker {
 
     /**
      * Check for errors and do rollback id it needed.
+     *
      * @param message contains information about actions, after which system has been checked for errors.
      * @return true, if rollback has been done.
      */
-    public boolean checkForRollback(String message){
+    public boolean checkForRollback(String message) {
         boolean isRollbackDone = false;
-        try{
+        try {
             checkForErrors();
         } catch (HotRedeployException e) {
             isRollbackDone = true;
-            if(checkWithUser(message)){
+            if (checkWithUser(message)) {
                 doRollback(config);
             } else {
                 throw new HotRedeployException("Hot redeploy failed. Rollback canceled by user.");
@@ -62,16 +61,36 @@ public class RollbackChecker {
     private void checkForErrors() {
         List<ProcessingUnit> processingUnits = puManager.identProcessingUnits(config.getPuNames());
         for (ProcessingUnit processingUnit : processingUnits) {
-            processingUnit.waitFor(processingUnit.getPlannedNumberOfInstances(), config.getIdentifyInstancesTimeout(), TimeUnit.SECONDS);
-            ProcessingUnitInstance[] instances = processingUnit.getInstances();
-            if (instances.length != processingUnit.getPlannedNumberOfInstances()) {
-                throw new HotRedeployException("Processing unit instances has been lost");
+            long stopTrying = System.currentTimeMillis() + config.getIdentifyInstancesTimeout();
+            long sleepTime = 1000;
+            while (processingUnit.getStatus() != DeploymentStatus.INTACT) {
+                if (stopTrying < System.currentTimeMillis()) throw new HotRedeployException();
+                try {
+                    Thread.sleep(sleepTime);
+                } catch (InterruptedException e) {
+                    log.info(e);
+                }
             }
+            ProcessingUnitInstance[] instances = processingUnit.getInstances();
             if (processingUnit.getType() == ProcessingUnitType.STATEFUL) {
                 PuUtils.identSpaceMode(instances, config);
             }
         }
     }
+
+    private static void waitForPuDeployed(GridServiceManager gsm, String puName) throws InterruptedException {
+        // ElasticStatefulProcessingUnitDeployment.addDependency() doesn't work. This is a workaround
+        ProcessingUnits pus = gsm.getAdmin().getProcessingUnits();
+        ProcessingUnit pu;
+        int sleepInterval = 1000;
+        System.out.print(String.format("Waiting for PU [%s] ", puName));
+        while ((pu = pus.getProcessingUnit(puName)) == null || pu.getStatus() != DeploymentStatus.INTACT) {
+            Thread.sleep(sleepInterval);
+            System.out.print(".");
+        }
+        System.out.println(" DONE");
+    }
+
 
     /**
      * When some errors occurred, check with user if rollback needed.
@@ -107,7 +126,7 @@ public class RollbackChecker {
             GridServiceContainer gsc = findEmptyContainer();
             if (gsc != null) {
                 log.info("Restarting GSC with id " + gsc.getAgentId());
-               gsc.restart();
+                gsc.restart();
             } else {
                 throw new HotRedeployException("There is no empty GSC in system. If you want to rollback please start new GSC manually");
             }
@@ -123,11 +142,12 @@ public class RollbackChecker {
 
     /**
      * Restart all GSMs one by one.
+     *
      * @param managers all found GSMs in system.
      */
-    private void restartGSMs(GridServiceManager[] managers){
+    private void restartGSMs(GridServiceManager[] managers) {
         int numberOfManagers = managers.length;
-        for (GridServiceManager gsm:managers){
+        for (GridServiceManager gsm : managers) {
             log.info("Restarting gsm with id " + gsm.getAgentId());
             gsm.restart();
             try {
@@ -142,11 +162,12 @@ public class RollbackChecker {
 
     /**
      * Look for empty container.
+     *
      * @return the first occurrence of empty GSC in system. If there are no empty GSC in system returns null.
      */
-    private GridServiceContainer findEmptyContainer(){
+    private GridServiceContainer findEmptyContainer() {
         GridServiceContainer[] containers = puManager.getContainers();
-        for (GridServiceContainer gsc : containers){
+        for (GridServiceContainer gsc : containers) {
             if (gsc.getProcessingUnitInstances().length == 0) {
                 return gsc;
             }
