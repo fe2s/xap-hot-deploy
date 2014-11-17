@@ -11,6 +11,7 @@ Tool will restart all processing units defined by user.
 Old deployment files for specified pu will be moved to the temp folder. 
 New files will be copied to the gigaspaces xap deploy folder. 
 After that application will discover all processing units and restart them.
+The tool supports elastic pu.
 
 Stateful PU restart.
 ---
