@@ -44,7 +44,7 @@ public class PropertyParser {
         configuration.setGigaspacesLocation(prop.getProperty("GS_HOME_DIR"));
         String locator = prop.getProperty("LOOKUPLOCATORS");
         if (!"".equals(locator)) {
-            configuration.setLocator(prop.getProperty(locator));
+            configuration.setLocator(locator);
         }
         String group = prop.getProperty("LOOKUPGROUPS");
         if (!"".equals(group)) {
